@@ -7,11 +7,6 @@
 
     switch($mod){
 
-        case 'pre_registrasi':
-            $login_email = $_POST['login_email'];
-            pre_registrasi($login_email);
-            break;
-
         case 'registrasi':
             $login_email = $_POST['login_email'];
             $user_nama_lengkap = $_POST['user_nama_lengkap'];
@@ -19,6 +14,12 @@
             $login_pass = $_POST['login_pass'];
             $user_alamat = $_POST['user_alamat'];
             registrasi($login_email,$user_nama_lengkap,$user_no_hp,$user_alamat,$login_pass);
+            break;
+
+        case 'login':
+            $login_email = $_POST['login_email'];
+            $login_pass = $_POST['login_pass'];
+            login($login_email,$login_pass);
             break;
 
         case 'update_profile':
@@ -132,9 +133,10 @@
         echo json_encode($response);
     }
 
-    function pre_registrasi($login_email){
-        
-        if(empty($login_email)){          
+
+    function registrasi($login_email,$user_nama_lengkap,$user_no_hp,$user_alamat,$login_pass){
+
+        if(empty($login_email) || empty($user_nama_lengkap) || empty($user_no_hp) || empty($login_pass) || empty($user_alamat)){
             required_field();
         }else{
 
@@ -145,8 +147,16 @@
                 $response['pesan']='Email telah terdaftar.';
                 echo json_encode($response);
             }else{
+                $reg0 = mysqli_query(db(),"INSERT INTO tb_user (user_nama_lengkap,user_alamat,user_no_hp,user_updated_at) VALUES ('$user_nama_lengkap','$user_alamat','$user_no_hp',now())");
+
+                $get_id = mysqli_query(db(),"SELECT MAX(user_id) as user_id FROM tb_user");
+
+                $user_id = mysqli_fetch_assoc($get_id)['user_id'];
+
+                $reg1 = mysqli_query(db(),"INSERT INTO tb_login (login_email,login_pass,login_lvl,user_id) VALUES ('$login_email','$login_pass','USER','$user_id')");
+
                 $response['error']=false;
-                $response['pesan']='Email diterima';
+                $response['pesan']='Registrasi berhasil.';
                 echo json_encode($response);
             }
 
@@ -154,23 +164,41 @@
 
     }
 
-    function registrasi($login_email,$user_nama_lengkap,$user_no_hp,$user_alamat,$login_pass){
+    function login($login_email, $login_pass){
 
-        if(empty($login_email) || empty($user_nama_lengkap) || empty($user_no_hp) || empty($login_pass) || empty($user_alamat)){
+        if(empty($login_email) || empty($login_pass)){
             required_field();
         }else{
 
-            $reg0 = mysqli_query(db(),"INSERT INTO tb_user (user_nama_lengkap,user_alamat,user_no_hp,user_updated_at) VALUES ('$user_nama_lengkap','$user_alamat','$user_no_hp',now())");
+            $login = mysqli_query(db(),"SELECT * FROM tb_login WHERE login_email='$login_email' AND login_pass='$login_pass'");
 
-            $get_id = mysqli_query(db(),"SELECT MAX(user_id) as user_id FROM tb_user");
+            if(mysqli_num_rows($login) > 0){
 
-            $user_id = mysqli_fetch_assoc($get_id)['user_id'];
+                $row_login = mysqli_fetch_assoc($login);
+                $user_id = $row_login['user_id'];
+                $user_email = $row_login['login_email'];
 
-            $reg1 = mysqli_query(db(),"INSERT INTO tb_login (login_email,login_pass,login_lvl,user_id) VALUES ('$login_email','$login_pass','USER','$user_id')");
+                $user = mysqli_query(db(),"SELECT * FROM tb_user WHERE user_id='$user_id'");
+                $row_user = mysqli_fetch_assoc($user);
+                $user_nama_lengkap = $row_user['user_nama_lengkap'];
+                $user_alamat = $row_user['user_alamat'];
+                $user_no_hp = $row_user['user_no_hp'];
 
-            $response['error']=false;
-            $response['pesan']='Registrasi berhasil.';
-            echo json_encode($response);
+                $response['error']=false;
+                $response['pesan']='Login sukses.';
+                $response['user']['user_id']=$user_id;
+                $response['user']['user_email']=$user_email;
+                $response['user']['user_nama_lengkap']=$user_nama_lengkap;
+                $response['user']['user_alamat']=$user_alamat;
+                $response['user']['user_no_hp']=$user_no_hp;
+
+                echo json_encode($response);
+
+            }else{
+                $response['error']=true;
+                $response['pesan']='Login gagal, Email atau Password salah.';
+                echo json_encode($response);
+            }
 
         }
 
