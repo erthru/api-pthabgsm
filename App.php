@@ -21,7 +21,7 @@
             registrasi($login_email,$user_nama_lengkap,$user_no_hp,$user_alamat,$login_pass);
             break;
 
-        case 'update_profil':
+        case 'update_profile':
             $user_id = $_POST['user_id'];
             $user_nama_lengkap = $_POST['user_nama_lengkap'];
             $user_alamat = $_POST['user_alamat'];
@@ -45,6 +45,11 @@
         case 'delete_barang_servis':
             $servis_id = $_POST['servis_id'];
             delete_barang_servis($servis_id);
+            break;
+
+        case 'daftar_barang_servis':
+            $page = $_GET['page'];
+            daftar_barang_servis($page);
             break;
 
         case 'start_booking':
@@ -84,6 +89,22 @@
         case 'ditolak_booking':
             $booking_id = $_POST['booking_id'];
             ditolak_booking($booking_id);
+            break;
+
+        case 'daftar_booking_user':
+            $user_id = $_GET['user_id'];
+            $page = $_GET['page'];
+            daftar_booking_user($user_id,$page);
+            break;
+
+        case 'daftar_booking_item':
+            $booking_id = $_GET['booking_id'];
+            daftar_booking_item($booking_id);
+            break;
+
+        case 'daftar_booking_status':
+            $booking_id = $_GET['booking_id'];
+            daftar_booking_status($booking_id);
             break;
 
         default:
@@ -219,13 +240,37 @@
 
     }
 
-    function start_booking($booking_jenis_servis, $user_id, $dealer_id){
-
-        if(empty($user_id) || empty($dealer_id)){
+    function daftar_barang_servis($page){
+        if(empty($page)){
             required_field();
         }else{
 
-            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_created_at,user_id,dealer_id) VALUES ($booking_jenis_servis, now(), '$user_id', '$dealer_id')");
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit; 
+
+            $daftar = mysqli_query(db(),"SELECT * FROM tb_barang_servis ORDER BY barang_servis_id DESC LIMIT $limit_start,$limit");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($daftar)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['daftar_barang_servis']=$result;
+            echo json_encode($response);
+
+        }
+    }
+
+    function start_booking($booking_jenis_servis, $user_id, $dealer_id){
+
+        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis)){
+            required_field();
+        }else{
+
+            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', now(), '$user_id', '$dealer_id')");
 
             $book_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT MAX(booking_id) as booking_id FROM tb_booking"))['booking_id'];
 
@@ -291,19 +336,31 @@
 
                 $unselected_booking_item_id_arr = explode(',',rtrim($unselected_booking_item_id,','));
             
-                for($i=0; $i<count($unselected_booking_item_id_arr); $i++){
+                $get_item_lenght = mysqli_query(db(), "SELECT COUNT(*) AS lenght FROM tb_booking_item WHERE booking_id = '$booking_id'");
+                $item_lenght = mysqli_fetch_assoc($get_item_lenght)['lenght'];
 
-                    $set_item = mysqli_query(db(), "UPDATE tb_booking_item SET booking_item_status='DITOLAK' WHERE booking_item_id = '$unselected_booking_item_id_arr[$i]'");
+                if(count($unselected_booking_item_id_arr) >= (int)$item_lenght){
+                    $response['error']=false;
+                    $response['pesan']='Pemilihan salah.';
+                    echo json_encode($response);
+                }else{
+
+                    for($i=0; $i<count($unselected_booking_item_id_arr); $i++){
+
+                        $set_item = mysqli_query(db(), "UPDATE tb_booking_item SET booking_item_status='DITOLAK' WHERE booking_item_id = '$unselected_booking_item_id_arr[$i]'");
+    
+                    }
+
+                    $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
+
+                    $response['error']=false;
+                    $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
+                    echo json_encode($response);
+
 
                 }
 
             }
-
-            $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
-
-            $response['error']=false;
-            $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
-            echo json_encode($response);
 
         }
 
@@ -351,7 +408,109 @@
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'DITOLAK','$booking_id')");
 
             $response['error']=false;
-            $response['pesan']='Booking selesai.';
+            $response['pesan']='Booking ditolak.';
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_booking_user($user_id,$page){
+
+        if(empty($user_id)){
+            required_field();
+        }else{
+
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit; 
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.* 
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            WHERE tb_booking.user_id = '$user_id'
+            
+            ORDER BY tb_booking.booking_id DESC
+
+            LIMIT $limit_start,$limit
+            
+            ");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $result[] = $row;
+            }
+
+            $get_user_name = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_nama_lengkap FROM tb_user WHERE user_id = '$user_id'"))['user_nama_lengkap'];
+
+            $response['error']=false;
+            $response['pesan']='Data booking user '.$get_user_name;
+            $response['data_booking_user']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_booking_item($booking_id){
+
+        if(empty($booking_id)){
+            required_field();
+        }else{
+
+            $bi = mysqli_query(db(), "
+            SELECT tb_booking_item.*,
+            tb_barang_servis.* 
+            
+            FROM tb_booking_item 
+            
+            LEFT JOIN tb_barang_servis ON tb_barang_servis.barang_servis_id = tb_booking_item.barang_servis_id 
+            
+            WHERE tb_booking_item.booking_id = '$booking_id'
+            
+            ORDER BY tb_booking_item.booking_item_id DESC
+            
+            ");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bi)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['status']='Sukses';
+            $response['booking_item']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_booking_status($booking_id){
+
+        if(empty($booking_id)){
+            required_field();
+        }else{
+
+            $bs = mysqli_query(db(), "SELECT * FROM tb_booking_status WHERE booking_id = '$booking_id'");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bs)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['status']='Sukses';
+            $response['booking_status']=$result;
             echo json_encode($response);
 
         }
