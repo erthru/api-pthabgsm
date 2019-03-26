@@ -98,6 +98,12 @@
             daftar_booking_user($user_id,$page);
             break;
 
+        case 'riwayat_booking_user':
+            $user_id = $_GET['user_id'];
+            $page = $_GET['page'];
+            riwayat_booking_user($user_id,$page);
+            break;
+
         case 'daftar_booking_item':
             $booking_id = $_GET['booking_id'];
             daftar_booking_item($booking_id);
@@ -106,6 +112,11 @@
         case 'daftar_booking_status':
             $booking_id = $_GET['booking_id'];
             daftar_booking_status($booking_id);
+            break;
+
+        case 'report_user':
+            $user_id = $_GET['user_id'];
+            report_user($user_id);
             break;
 
         default:
@@ -487,6 +498,54 @@
 
     }
 
+    function riwayat_booking_user($user_id,$page){
+
+        if(empty($user_id)){
+            required_field();
+        }else{
+
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit; 
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*, 
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status 
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            LEFT JOIN tb_booking_status ON tb_booking_status.booking_id = tb_booking.booking_id 
+            
+            WHERE tb_booking.user_id = '$user_id' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) = 'SELESAI' OR (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) = 'DITOLAK' 
+            
+            GROUP BY tb_booking.booking_id 
+            
+            ORDER BY tb_booking.booking_id DESC 
+
+            LIMIT $limit_start,$limit
+            
+            ");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $result[] = $row;
+            }
+
+            $get_user_name = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_nama_lengkap FROM tb_user WHERE user_id = '$user_id'"))['user_nama_lengkap'];
+
+            $response['error']=false;
+            $response['pesan']='Riwayat booking user '.$get_user_name;
+            $response['riwayat_booking_user']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
     function daftar_booking_item($booking_id){
 
         if(empty($booking_id)){
@@ -539,6 +598,32 @@
             $response['error']=false;
             $response['status']='Sukses';
             $response['booking_status']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function report_user($user_id){
+
+        if(empty($user_id)){
+            required_field();
+        }else{
+
+            $total_pesanan = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) as total_pesanan FROM tb_booking WHERE user_id='$user_id'"))['total_pesanan'];
+
+            $today_pesanan = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) as today_pesanan FROM tb_booking WHERE DATE(booking_created_at) = CURDATE() AND user_id='$user_id'"))['today_pesanan'];
+
+            $servis_berjalan = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT MAX(booking_status_stat) FROM tb_booking_status WHERE booking_id = a.booking_id) != 'SELESAI'"));
+
+            $servis_selesai = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT MAX(booking_status_stat) FROM tb_booking_status WHERE booking_id = a.booking_id) = 'SELESAI'"));
+
+            $response['error']=false;
+            $response['status']='Sukses';
+            $response['report_user']['total_pesanan']=(int)$total_pesanan;
+            $response['report_user']['today_pesanan']=(int)$today_pesanan;
+            $response['report_user']['servis_berjalan']=$servis_berjalan;
+            $response['report_user']['servis_selesai']=$servis_selesai;
             echo json_encode($response);
 
         }
