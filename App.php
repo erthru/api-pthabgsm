@@ -57,7 +57,8 @@
             $user_id = $_POST['user_id'];
             $dealer_id = $_POST['dealer_id'];
             $booking_jenis_servis = $_POST['booking_jenis_servis'];
-            start_booking($booking_jenis_servis, $user_id, $dealer_id);
+            $booking_keterangan = $_POST['booking_keterangan'];
+            start_booking($booking_jenis_servis, $user_id, $dealer_id, $booking_keterangan);
             break;
 
         case 'terima_booking':
@@ -303,13 +304,13 @@
         }
     }
 
-    function start_booking($booking_jenis_servis, $user_id, $dealer_id){
+    function start_booking($booking_jenis_servis, $user_id, $dealer_id, $booking_keterangan){
 
-        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis)){
+        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis) || empty($booking_keterangan)){
             required_field();
         }else{
 
-            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', now(), '$user_id', '$dealer_id')");
+            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_keterangan,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', '$booking_keterangan',now(), '$user_id', '$dealer_id')");
 
             $book_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT MAX(booking_id) as booking_id FROM tb_booking"))['booking_id'];
 
@@ -466,14 +467,15 @@
             $bu = mysqli_query(db(), "
             SELECT tb_booking.*,
             tb_dealer.*,
-            tb_user.* 
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
             
             FROM tb_booking 
             
             LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
             LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
             
-            WHERE tb_booking.user_id = '$user_id'
+            WHERE tb_booking.user_id = '$user_id' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) != 'SELESAI' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) != 'DITOLAK'
             
             ORDER BY tb_booking.booking_id DESC
 
