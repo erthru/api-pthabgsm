@@ -589,7 +589,7 @@
             required_field();
         }else{
 
-            $bs = mysqli_query(db(), "SELECT * FROM tb_booking_status WHERE booking_id = '$booking_id'");
+            $bs = mysqli_query(db(), "SELECT * FROM tb_booking_status WHERE booking_id = '$booking_id' ORDER BY booking_status_id DESC");
 
             $result = array();
 
