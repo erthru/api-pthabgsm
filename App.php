@@ -372,33 +372,29 @@
             required_field();
         }else{
 
-            if(!empty($unselected_booking_item_id)){
-
-                $unselected_booking_item_id_arr = explode(',',rtrim($unselected_booking_item_id,','));
+            $unselected_booking_item_id_arr = explode(',',rtrim($unselected_booking_item_id,','));
             
-                $get_item_lenght = mysqli_query(db(), "SELECT COUNT(*) AS lenght FROM tb_booking_item WHERE booking_id = '$booking_id'");
-                $item_lenght = mysqli_fetch_assoc($get_item_lenght)['lenght'];
+            $get_item_lenght = mysqli_query(db(), "SELECT COUNT(*) AS lenght FROM tb_booking_item WHERE booking_id = '$booking_id'");
+            $item_lenght = mysqli_fetch_assoc($get_item_lenght)['lenght'];
 
-                if(count($unselected_booking_item_id_arr) >= (int)$item_lenght){
-                    $response['error']=false;
-                    $response['pesan']='Pemilihan salah.';
-                    echo json_encode($response);
-                }else{
+            if(count($unselected_booking_item_id_arr) >= (int)$item_lenght){
+                $response['error']=true;
+                $response['pesan']='Pemilihan salah.';
+                echo json_encode($response);
+            }else{
 
-                    for($i=0; $i<count($unselected_booking_item_id_arr); $i++){
+                for($i=0; $i<count($unselected_booking_item_id_arr); $i++){
 
-                        $set_item = mysqli_query(db(), "UPDATE tb_booking_item SET booking_item_status='DITOLAK' WHERE booking_item_id = '$unselected_booking_item_id_arr[$i]'");
-    
-                    }
-
-                    $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
-
-                    $response['error']=false;
-                    $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
-                    echo json_encode($response);
-
+                    $set_item = mysqli_query(db(), "UPDATE tb_booking_item SET booking_item_status='DITOLAK' WHERE booking_item_id = '$unselected_booking_item_id_arr[$i]'");
 
                 }
+
+                $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
+
+                $response['error']=false;
+                $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
+                echo json_encode($response);
+
 
             }
 
@@ -562,7 +558,7 @@
             
             LEFT JOIN tb_barang_servis ON tb_barang_servis.barang_servis_id = tb_booking_item.barang_servis_id 
             
-            WHERE tb_booking_item.booking_id = '$booking_id'
+            WHERE tb_booking_item.booking_id = '$booking_id' AND tb_booking_item.booking_item_status = 'DIPILIH' 
             
             ORDER BY tb_booking_item.booking_item_id DESC
             
