@@ -27,7 +27,12 @@
             $user_nama_lengkap = $_POST['user_nama_lengkap'];
             $user_alamat = $_POST['user_alamat'];
             $user_no_hp = $_POST['user_no_hp'];
-            update_profile($user_id, $user_nama_lengkap, $user_alamat, $no_hp);
+            update_profile($user_id, $user_nama_lengkap, $user_alamat, $user_no_hp);
+            break;
+
+        case 'user_detail':
+            $user_id = $_GET['user_id'];
+            user_detail($user_id);
             break;
 
         case 'add_barang_servis':
@@ -680,6 +685,38 @@
             $response['report_user']['today_pesanan']=(int)$today_pesanan;
             $response['report_user']['servis_berjalan']=$servis_berjalan;
             $response['report_user']['servis_selesai']=$servis_selesai;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function user_detail($user_id){
+
+        if(empty($user_id)){
+            required_field();
+        }else{
+
+            $user = mysqli_query(db(),"SELECT tb_user.*, tb_login.* FROM tb_user LEFT JOIN tb_login ON tb_login.user_id = tb_user.user_id WHERE tb_user.user_id='$user_id'");
+            $row = mysqli_fetch_assoc($user);
+
+            $id = $row['user_id'];
+            $nama_lengkap = $row['user_nama_lengkap'];
+            $alamat = $row['user_alamat'];
+            $nohp = $row['user_no_hp'];
+            $created_at = $row['user_created_at'];
+            $updated_at = $row['user_updated_at'];
+            $email = $row['login_email'];
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['user']['user_id']=$id;
+            $response['user']['user_nama_lengkap'] = $nama_lengkap;
+            $response['user']['user_alamat'] = $alamat;
+            $response['user']['user_no_hp'] = $nohp;
+            $response['user']['user_created_at'] = $created_at;
+            $response['user']['user_updated_at'] = $updated_at;
+            $response['user']['login_email'] = $email;
             echo json_encode($response);
 
         }
