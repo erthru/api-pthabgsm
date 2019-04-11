@@ -58,6 +58,11 @@
             daftar_barang_servis($page);
             break;
 
+        case 'search_barang_servis':
+            $q = $_GET['q'];
+            search_barang_servis($q);
+            break;
+
         case 'start_booking':
             $user_id = $_POST['user_id'];
             $dealer_id = $_POST['dealer_id'];
@@ -102,6 +107,16 @@
             $user_id = $_GET['user_id'];
             $page = $_GET['page'];
             daftar_booking_user($user_id,$page);
+            break;
+
+        case 'daftar_booking_all':
+            $page = $_GET['page'];
+            daftar_booking_all($page);
+            break;
+
+        case 'search_booking_all':
+            $q = $_GET['q'];
+            search_booking_all($q);
             break;
 
         case 'riwayat_booking_user':
@@ -302,6 +317,31 @@
             $limit_start = ($page - 1) * $limit; 
 
             $daftar = mysqli_query(db(),"SELECT * FROM tb_barang_servis ORDER BY barang_servis_id DESC LIMIT $limit_start,$limit");
+            $total = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) AS total FROM tb_barang_servis"))['total'];
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($daftar)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['total']=$total;
+            $response['daftar_barang_servis']=$result;
+            echo json_encode($response);
+
+        }
+    }
+
+    function search_barang_servis($q){
+        if(empty($q)){
+            required_field();
+        }else{
+
+            $limit = 10;
+
+            $daftar = mysqli_query(db(),"SELECT * FROM tb_barang_servis WHERE barang_servis_nama LIKE '%$q%' ORDER BY barang_servis_id DESC LIMIT $limit");
 
             $result = array();
 
@@ -503,6 +543,105 @@
             $response['error']=false;
             $response['pesan']='Data booking user '.$get_user_name;
             $response['data_booking_user']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_booking_all($page){
+
+        if(empty($page)){
+            required_field();
+        }else{
+
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit; 
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+                        
+            ORDER BY tb_booking.booking_id DESC
+
+            LIMIT $limit_start,$limit
+            
+            ");
+
+            $total = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+                        
+            ORDER BY tb_booking.booking_id DESC
+            
+            ");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['total']=mysqli_num_rows($total);
+            $response['data_booking']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function search_booking_all($q){
+
+        if(empty($q)){
+            required_field();
+        }else{
+
+            $limit = 10;
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+
+            WHERE tb_user.user_nama_lengkap LIKE '%$q%' OR tb_booking.booking_id LIKE '%$q%' OR tb_booking.booking_jenis_servis LIKE '%$q%' 
+                        
+            ORDER BY tb_booking.booking_id DESC
+
+            LIMIT $limit
+            
+            ");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['data_booking']=$result;
             echo json_encode($response);
 
         }
