@@ -38,14 +38,16 @@
         case 'add_barang_servis':
             $servis_nama = $_POST['servis_nama'];
             $servis_harga = $_POST['servis_harga'];
-            add_barang_servis($servis_nama,$servis_harga);
+            $servis_kategori = $_POST['servis_kategori'];
+            add_barang_servis($servis_nama,$servis_harga,$servis_kategori);
             break;
 
         case 'update_barang_servis':
             $servis_id = $_POST['servis_id'];
             $servis_nama = $_POST['servis_nama'];
             $servis_harga = $_POST['servis_harga'];
-            update_barang_servis($servis_id,$servis_nama,$servis_harga);
+            $servis_kategori = $_POST['servis_kategori'];
+            update_barang_servis($servis_id,$servis_nama,$servis_harga,$servis_kategori);
             break;
 
         case 'delete_barang_servis':
@@ -260,13 +262,13 @@
 
     }
 
-    function add_barang_servis($servis_nama, $servis_harga){
+    function add_barang_servis($servis_nama, $servis_harga, $servis_kategori){
 
-        if(empty($servis_nama) || empty($servis_harga)){
+        if(empty($servis_nama) || empty($servis_harga) || empty($servis_kategori)){
             required_field();
         }else{
 
-            $add = mysqli_query(db(),"INSERT INTO tb_barang_servis (barang_servis_nama,barang_servis_harga,barang_servis_updated_at) VALUES ('$servis_nama','$servis_harga',now())");
+            $add = mysqli_query(db(),"INSERT INTO tb_barang_servis (barang_servis_nama,barang_servis_harga,barang_servis_kategori,barang_servis_updated_at) VALUES ('$servis_nama','$servis_harga','$servis_kategori',now())");
 
             $response['error']=false;
             $response['pesan']='Barang servis ditambahkan.';
@@ -276,13 +278,13 @@
 
     }
 
-    function update_barang_servis($servis_id, $servis_nama, $servis_harga){
+    function update_barang_servis($servis_id, $servis_nama, $servis_harga, $servis_kategori){
 
-        if(empty($servis_id) || empty($servis_nama) || empty($servis_harga)){
+        if(empty($servis_id) || empty($servis_nama) || empty($servis_harga) || empty($servis_kategori)){
             required_field();
         }else{
 
-            $update = mysqli_query(db(),"UPDATE tb_barang_servis SET barang_servis_nama='$servis_nama', barang_servis_harga='$servis_harga', barang_servis_updated_at = now() WHERE barang_servis_id='$servis_id'");
+            $update = mysqli_query(db(),"UPDATE tb_barang_servis SET barang_servis_nama='$servis_nama', barang_servis_harga='$servis_harga', barang_servis_kategori='$servis_kategori', barang_servis_updated_at = now() WHERE barang_servis_id='$servis_id'");
 
             $response['error']=false;
             $response['pesan']='Barang servis diperbarui.';
