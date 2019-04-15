@@ -35,6 +35,11 @@
             user_detail($user_id);
             break;
 
+        case 'user_all':
+            $page = $_GET['page'];
+            user_all($page);
+            break;
+
         case 'add_barang_servis':
             $servis_nama = $_POST['servis_nama'];
             $servis_harga = $_POST['servis_harga'];
@@ -860,6 +865,29 @@
             $response['user']['login_email'] = $email;
             echo json_encode($response);
 
+        }
+
+    }
+
+    function user_all($page){
+
+        if(empty($page)){
+            required_field();
+        }else{
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit;
+
+            $user = mysqli_query(db(),"SELECT tb_user.*, tb_login.* FROM tb_user LEFT JOIN tb_login ON tb_login.user_id = tb_user.user_id LIMIT $limit_start, $limit");
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($user)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses.';
+            $response['users']=$result;
+            echo json_encode($response);
         }
 
     }
