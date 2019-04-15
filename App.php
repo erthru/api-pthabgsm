@@ -40,6 +40,11 @@
             user_all($page);
             break;
 
+        case 'user_search':
+            $q = $_GET['q'];
+            user_search($q);
+            break;
+
         case 'add_barang_servis':
             $servis_nama = $_POST['servis_nama'];
             $servis_harga = $_POST['servis_harga'];
@@ -878,6 +883,30 @@
             $limit_start = ($page - 1) * $limit;
 
             $user = mysqli_query(db(),"SELECT tb_user.*, tb_login.* FROM tb_user LEFT JOIN tb_login ON tb_login.user_id = tb_user.user_id LIMIT $limit_start, $limit");
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($user)){
+                $result[] = $row;
+            }
+
+            $total = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) AS total FROM tb_user"))['total'];
+
+            $response['error']=false;
+            $response['pesan']='Sukses.';
+            $response['total']=$total;
+            $response['users']=$result;
+            echo json_encode($response);
+        }
+
+    }
+
+    function user_search($q){
+
+        if(empty($q)){
+            required_field();
+        }else{
+
+            $user = mysqli_query(db(),"SELECT tb_user.*, tb_login.* FROM tb_user LEFT JOIN tb_login ON tb_login.user_id = tb_user.user_id WHERE tb_user.user_nama_lengkap LIKE '%$q%' OR tb_login.login_email LIKE '%$q%' LIMIT 10");
             $result = array();
 
             while($row = mysqli_fetch_assoc($user)){
