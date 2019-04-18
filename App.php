@@ -121,6 +121,11 @@
             daftar_booking_user($user_id,$page);
             break;
 
+        case 'daftar_booking_detail':
+            $booking_id = $_GET['booking_id'];
+            daftar_booking_detail($booking_id);
+            break;
+
         case 'daftar_booking_all':
             $page = $_GET['page'];
             daftar_booking_all($page);
@@ -562,6 +567,85 @@
             $response['error']=false;
             $response['pesan']='Data booking user '.$get_user_name;
             $response['data_booking_user']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_booking_detail($booking_id){
+
+        if(empty($booking_id)){
+            required_field();
+        }else{
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            WHERE tb_booking.booking_id = '$booking_id' 
+            
+            ORDER BY tb_booking.booking_id DESC
+            
+            ");
+
+            $booking_id = null;
+            $booking_jenis_servis = null;
+            $booking_keterangan = null;
+            $booking_created_at = null;
+            $user_id = null;
+            $dealer_id = null;
+            $dealer_nama = null;
+            $dealer_alamat = null;
+            $user_nama_lengkap = null;
+            $user_alamat = null;
+            $user_no_hp = null;
+            $user_created_at = null;
+            $user_updated_at = null;
+            $last_status = null;
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $booking_id = $row['booking_id'];
+                $booking_jenis_servis = $row['booking_jenis_servis'];
+                $booking_keterangan = $row['booking_keterangan'];
+                $booking_created_at = $row['booking_created_at'];
+                $user_id = $row['user_id'];
+                $dealer_id = $row['dealer_id'];
+                $dealer_nama = $row['dealer_nama'];
+                $dealer_alamat = $row['dealer_alamat'];
+                $user_nama_lengkap = $row['user_nama_lengkap'];
+                $user_alamat = $row['user_alamat'];
+                $user_no_hp = $row['user_no_hp'];
+                $user_created_at = $row['user_created_at'];
+                $user_updated_at = $row['user_updated_at'];
+                $last_status = $row['last_status'];
+            }
+
+            $get_user_name = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_nama_lengkap FROM tb_user WHERE user_id = '$user_id'"))['user_nama_lengkap'];
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['data_booking_user']['booking_id']=$booking_id;
+            $response['data_booking_user']['booking_jenis_servis']=$booking_jenis_servis;
+            $response['data_booking_user']['booking_keterangan']=$booking_keterangan;
+            $response['data_booking_user']['booking_created_at']=$booking_created_at;
+            $response['data_booking_user']['user_id']=$user_id;
+            $response['data_booking_user']['dealer_id']=$dealer_id;
+            $response['data_booking_user']['dealer_nama']=$dealer_nama;
+            $response['data_booking_user']['dealer_alamat']=$dealer_alamat;
+            $response['data_booking_user']['user_nama_lengkap']=$user_nama_lengkap;
+            $response['data_booking_user']['user_alamat']=$user_alamat;
+            $response['data_booking_user']['user_no_hp']=$user_no_hp;
+            $response['data_booking_user']['user_created_at']=$user_created_at;
+            $response['data_booking_user']['user_updated_at']=$user_updated_at;
+            $response['data_booking_user']['last_status']=$last_status;
             echo json_encode($response);
 
         }
