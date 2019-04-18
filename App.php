@@ -632,20 +632,20 @@
 
             $response['error']=false;
             $response['pesan']='Sukses';
-            $response['data_booking_user']['booking_id']=$booking_id;
-            $response['data_booking_user']['booking_jenis_servis']=$booking_jenis_servis;
-            $response['data_booking_user']['booking_keterangan']=$booking_keterangan;
-            $response['data_booking_user']['booking_created_at']=$booking_created_at;
-            $response['data_booking_user']['user_id']=$user_id;
-            $response['data_booking_user']['dealer_id']=$dealer_id;
-            $response['data_booking_user']['dealer_nama']=$dealer_nama;
-            $response['data_booking_user']['dealer_alamat']=$dealer_alamat;
-            $response['data_booking_user']['user_nama_lengkap']=$user_nama_lengkap;
-            $response['data_booking_user']['user_alamat']=$user_alamat;
-            $response['data_booking_user']['user_no_hp']=$user_no_hp;
-            $response['data_booking_user']['user_created_at']=$user_created_at;
-            $response['data_booking_user']['user_updated_at']=$user_updated_at;
-            $response['data_booking_user']['last_status']=$last_status;
+            $response['data_booking']['booking_id']=$booking_id;
+            $response['data_booking']['booking_jenis_servis']=$booking_jenis_servis;
+            $response['data_booking']['booking_keterangan']=$booking_keterangan;
+            $response['data_booking']['booking_created_at']=$booking_created_at;
+            $response['data_booking']['user_id']=$user_id;
+            $response['data_booking']['dealer_id']=$dealer_id;
+            $response['data_booking']['dealer_nama']=$dealer_nama;
+            $response['data_booking']['dealer_alamat']=$dealer_alamat;
+            $response['data_booking']['user_nama_lengkap']=$user_nama_lengkap;
+            $response['data_booking']['user_alamat']=$user_alamat;
+            $response['data_booking']['user_no_hp']=$user_no_hp;
+            $response['data_booking']['user_created_at']=$user_created_at;
+            $response['data_booking']['user_updated_at']=$user_updated_at;
+            $response['data_booking']['last_status']=$last_status;
             echo json_encode($response);
 
         }
@@ -805,7 +805,7 @@
             $response['error']=false;
             $response['pesan']='Sukses';
             $response['total']=mysqli_num_rows($total);
-            $response['daftar_booking_user']=$result;
+            $response['data_booking']=$result;
             echo json_encode($response);
 
         }
