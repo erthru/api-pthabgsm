@@ -126,6 +126,13 @@
             daftar_booking_all($page);
             break;
 
+        case 'daftar_booking_all_date_filter':
+            $page = $_GET['page'];
+            $date_b = $_GET['date_b'];
+            $date_a = $_GET['date_a'];
+            daftar_booking_all_date_filter($page,$date_a,$date_b);
+            break;
+
         case 'search_booking_all':
             $q = $_GET['q'];
             search_booking_all($q);
@@ -654,6 +661,67 @@
             $response['error']=false;
             $response['pesan']='Sukses';
             $response['data_booking']=$result;
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_booking_all_date_filter($page,$date_b,$date_a){
+
+        if(empty($page) || empty($date_b) || empty($date_a)){
+            required_field();
+        }else{
+
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit; 
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            WHERE (DATE(tb_booking.booking_created_at) BETWEEN '$date_b' AND '$date_a') 
+            
+            GROUP BY tb_booking.booking_id 
+            
+            ORDER BY tb_booking.booking_id DESC 
+
+            LIMIT $limit_start,$limit
+            
+            ");
+
+            $total = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            WHERE (DATE(tb_booking.booking_created_at) BETWEEN '$date_b' AND '$date_a') 
+            
+            ");
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['total']=mysqli_num_rows($total);
+            $response['daftar_booking_user']=$result;
             echo json_encode($response);
 
         }
