@@ -91,7 +91,8 @@
         case 'pemilihan_part_booking':
             $booking_id = $_POST['booking_id'];
             $barang_servis_id = $_POST['barang_servis_id'];
-            pemilihan_part_booking($booking_id, $barang_servis_id);
+            $booking_biaya = $_POST['booking_biaya'];
+            pemilihan_part_booking($booking_id, $barang_servis_id, $booking_biaya);
             break;
 
         case 'menunggu_persetujuan_booking':
@@ -418,9 +419,9 @@
     }
 
 
-    function pemilihan_part_booking($booking_id, $barang_servis_id){
+    function pemilihan_part_booking($booking_id, $barang_servis_id, $booking_biaya){
 
-        if(empty($booking_id) || empty($barang_servis_id)){
+        if(empty($booking_id) || empty($barang_servis_id) || $booking_biaya){
             required_field();
         }else{
 
@@ -428,11 +429,13 @@
             
             for($i=0; $i<count($barang_servis_id_arr); $i++){
 
-                $book_item = mysqli_query(db(), "INSERT INTO tb_booking_item (booking_id,barang_servis_id) VALUES ('$booking_id','$barang_servis_id_arr[$i]')");
+                $cur_harga = mysqli_fetch_assoc(mysqli_query(db(),"SELECT barang_servis_harga FROM tb_barang_servis WHERE barang_servis_id = '$barang_servis_id_arr[$i]'"))['barang_servis_harga'];
+                $book_item = mysqli_query(db(), "INSERT INTO tb_booking_item (booking_id,barang_servis_id,booking_item_cur_harga) VALUES ('$booking_id','$barang_servis_id_arr[$i]','$cur_harga')");
 
             }
 
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'PEMILIHAN PART','$booking_id')");
+            $biaya = mysqli_query(db(), "UPDATE FROM tb_booking SET booking_biaya='$booking_biaya' WHERE booking_id='$booking_id'");
 
             $response['error']=false;
             $response['pesan']='Pemilihan part untuk user diset. Menunggu user memilih part yang akan diservis.';
