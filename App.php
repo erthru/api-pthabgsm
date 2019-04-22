@@ -79,8 +79,12 @@
             $user_id = $_POST['user_id'];
             $dealer_id = $_POST['dealer_id'];
             $booking_jenis_servis = $_POST['booking_jenis_servis'];
+            $booking_model_kendaraan = $_POST['booking_model_kendaraan'];
+            $booking_vincode = $_POST['booking_vincode'];
+            $booking_km = $_POST['booking_km'];
+            $booking_no_polisi = $_POST['booking_no_polisi'];
             $booking_keterangan = $_POST['booking_keterangan'];
-            start_booking($booking_jenis_servis, $user_id, $dealer_id, $booking_keterangan);
+            start_booking($booking_jenis_servis, $booking_model_kendaraan, $booking_vincode, $booking_km, $booking_no_polisi, $user_id, $dealer_id, $booking_keterangan);
             break;
 
         case 'terima_booking':
@@ -382,13 +386,13 @@
         }
     }
 
-    function start_booking($booking_jenis_servis, $user_id, $dealer_id, $booking_keterangan){
+    function start_booking($booking_jenis_servis, $booking_model_kendaraan, $booking_vincode, $booking_km, $booking_no_polisi, $user_id, $dealer_id, $booking_keterangan){
 
-        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis) || empty($booking_keterangan)){
+        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis) || empty($booking_keterangan) || empty($booking_model_kendaraan) || empty($booking_vincode) || empty($booking_km) || empty($booking_no_polisi)){
             required_field();
         }else{
 
-            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_keterangan,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', '$booking_keterangan',now(), '$user_id', '$dealer_id')");
+            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_model_kendaraan,booking_vincode,booking_km,booking_no_polisi,booking_keterangan,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', '$booking_model_kendaraan', '$booking_vincode', '$booking_km', '$booking_no_polisi', '$booking_keterangan',now(), '$user_id', '$dealer_id')");
 
             $book_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT MAX(booking_id) as booking_id FROM tb_booking"))['booking_id'];
 
