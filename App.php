@@ -425,7 +425,7 @@
 
     function pemilihan_part_booking($booking_id, $barang_servis_id, $booking_biaya){
 
-        if(empty($booking_id) || empty($barang_servis_id) || $booking_biaya){
+        if(empty($booking_id) || empty($barang_servis_id) || empty($booking_biaya)){
             required_field();
         }else{
 
@@ -605,6 +605,10 @@
 
             $booking_id = null;
             $booking_jenis_servis = null;
+            $booking_model_kendaraan = null;
+            $booking_vincode = null;
+            $booking_km = null;
+            $booking_no_polisi = null;
             $booking_keterangan = null;
             $booking_created_at = null;
             $user_id = null;
@@ -621,6 +625,10 @@
             while($row = mysqli_fetch_assoc($bu)){
                 $booking_id = $row['booking_id'];
                 $booking_jenis_servis = $row['booking_jenis_servis'];
+                $booking_model_kendaraan = $row['booking_model_kendaraan'];
+                $booking_vincode = $row['booking_vincode'];
+                $booking_km = $row['booking_km'];
+                $booking_no_polisi = $row['booking_no_polisi'];
                 $booking_keterangan = $row['booking_keterangan'];
                 $booking_created_at = $row['booking_created_at'];
                 $user_id = $row['user_id'];
@@ -641,6 +649,10 @@
             $response['pesan']='Sukses';
             $response['data_booking']['booking_id']=$booking_id;
             $response['data_booking']['booking_jenis_servis']=$booking_jenis_servis;
+            $response['data_booking']['booking_model_kendaraan']=$booking_model_kendaraan;
+            $response['data_booking']['booking_vincode']=$booking_vincode;
+            $response['data_booking']['booking_km']=$booking_km;
+            $response['data_booking']['booking_no_polisi']=$booking_no_polisi;
             $response['data_booking']['booking_keterangan']=$booking_keterangan;
             $response['data_booking']['booking_created_at']=$booking_created_at;
             $response['data_booking']['user_id']=$user_id;
