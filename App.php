@@ -610,6 +610,7 @@
             $booking_km = null;
             $booking_no_polisi = null;
             $booking_keterangan = null;
+            $booking_biaya = null;
             $booking_created_at = null;
             $user_id = null;
             $dealer_id = null;
@@ -630,6 +631,7 @@
                 $booking_km = $row['booking_km'];
                 $booking_no_polisi = $row['booking_no_polisi'];
                 $booking_keterangan = $row['booking_keterangan'];
+                $booking_biaya = $row['booking_biaya'];
                 $booking_created_at = $row['booking_created_at'];
                 $user_id = $row['user_id'];
                 $dealer_id = $row['dealer_id'];
@@ -654,6 +656,7 @@
             $response['data_booking']['booking_km']=$booking_km;
             $response['data_booking']['booking_no_polisi']=$booking_no_polisi;
             $response['data_booking']['booking_keterangan']=$booking_keterangan;
+            $response['data_booking']['booking_biaya']=$booking_biaya;
             $response['data_booking']['booking_created_at']=$booking_created_at;
             $response['data_booking']['user_id']=$user_id;
             $response['data_booking']['dealer_id']=$dealer_id;
