@@ -177,6 +177,23 @@
             report_user($user_id);
             break;
 
+        case 'save_user_token':
+            $user_id = $_POST['user_id'];
+            $token = $_POST['token'];
+            save_user_token($user_id,$token);
+            break;
+
+        case 'remove_user_token':
+            $user_id = $_POST['user_id'];
+            remove_user_token($user_id);
+            break;
+
+        case 'send_notification_to_user':
+            $user_id = $_GET['user_id'];
+            $message = $_GET['message'];
+            send_notification_to_user($user_id,$message);
+            break;
+
         default:
             bad_request();
             break;
@@ -414,6 +431,9 @@
 
             $appr = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'DITERIMA','$booking_id')");
 
+            $user_id = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_id FROM tb_booking WHERE booking_id='$booking_id' LIMIT 1"))['user_id'];
+            send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id diterima.");
+
             $response['error']=false;
             $response['pesan']='Booking diterima.';
             echo json_encode($response);
@@ -439,7 +459,10 @@
             }
 
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'PEMILIHAN PART','$booking_id')");
-            $biaya = mysqli_query(db(), "UPDATE FROM tb_booking SET booking_biaya='$booking_biaya' WHERE booking_id='$booking_id'");
+            $biaya = mysqli_query(db(), "UPDATE tb_booking SET booking_biaya='$booking_biaya' WHERE booking_id='$booking_id'");
+
+            $user_id = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_id FROM tb_booking WHERE booking_id='$booking_id' LIMIT 1"))['user_id'];
+            send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id. Telah ditentukan sparepart/item servis yang akan digunakan.");
 
             $response['error']=false;
             $response['pesan']='Pemilihan part untuk user diset. Menunggu user memilih part yang akan diservis.';
@@ -456,31 +479,41 @@
             required_field();
         }else{
 
-            $unselected_booking_item_id_arr = explode(',',rtrim($unselected_booking_item_id,','));
-            
-            $get_item_lenght = mysqli_query(db(), "SELECT COUNT(*) AS lenght FROM tb_booking_item WHERE booking_id = '$booking_id'");
-            $item_lenght = mysqli_fetch_assoc($get_item_lenght)['lenght'];
-
-            if(count($unselected_booking_item_id_arr) >= (int)$item_lenght){
-                $response['error']=true;
-                $response['pesan']='Pemilihan salah.';
-                echo json_encode($response);
-            }else{
-
-                for($i=0; $i<count($unselected_booking_item_id_arr); $i++){
-
-                    $set_item = mysqli_query(db(), "UPDATE tb_booking_item SET booking_item_status='DITOLAK' WHERE booking_item_id = '$unselected_booking_item_id_arr[$i]'");
-
-                }
-
+            if(empty($unselected_booking_item_id)){
                 $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
-
+    
                 $response['error']=false;
                 $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
                 echo json_encode($response);
-
-
+            }else{
+                $unselected_booking_item_id_arr = explode(',',rtrim($unselected_booking_item_id,','));
+            
+                $get_item_lenght = mysqli_query(db(), "SELECT COUNT(*) AS lenght FROM tb_booking_item WHERE booking_id = '$booking_id'");
+                $item_lenght = mysqli_fetch_assoc($get_item_lenght)['lenght'];
+    
+                if(count($unselected_booking_item_id_arr) >= (int)$item_lenght){
+                    $response['error']=true;
+                    $response['pesan']='Pemilihan salah.';
+                    echo json_encode($response);
+                }else{
+    
+                    for($i=0; $i<count($unselected_booking_item_id_arr); $i++){
+    
+                        $set_item = mysqli_query(db(), "UPDATE tb_booking_item SET booking_item_status='DITOLAK' WHERE booking_item_id = '$unselected_booking_item_id_arr[$i]'");
+    
+                    }
+    
+                    $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
+    
+                    $response['error']=false;
+                    $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
+                    echo json_encode($response);
+    
+    
+                }
             }
+
+            
 
         }
 
@@ -494,6 +527,9 @@
         }else{
 
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'DALAM PENGERJAAN','$booking_id')");
+
+            $user_id = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_id FROM tb_booking WHERE booking_id='$booking_id' LIMIT 1"))['user_id'];
+            send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id telah dalam pengerjaan.");
 
             $response['error']=false;
             $response['pesan']='Booking dalam pengerjaan.';
@@ -510,6 +546,8 @@
         }else{
 
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'SELESAI','$booking_id')");
+            $user_id = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_id FROM tb_booking WHERE booking_id='$booking_id' LIMIT 1"))['user_id'];
+            send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id telah selesai.");
 
             $response['error']=false;
             $response['pesan']='Booking selesai.';
@@ -1091,6 +1129,92 @@
             $response['pesan']='Sukses.';
             $response['users']=$result;
             echo json_encode($response);
+        }
+
+    }
+
+    function notification_prepare($token,$message){
+
+        $FIREBASE_SERVER = 'AAAACQ_QVi0:APA91bE0AzxMVfyMZgQEZYRxyjB-DA3VRNj9AIrbTqmakw63DDRvB1a4WdcAPkYxiMruVH-kHi_30bAMce1izs8k_RkwHdxbHDzuLy-PeShdSGWSv0cm6B8h4IsqNg1HJi97LVe7AVU8';
+
+        $msg = array(
+        'body' 	=> $message,
+                'icon'	=> 'myicon',
+                'sound' => 'mySound'
+        );
+        
+        $fields = array(
+            'to'		=> $token,
+            'notification'	=> $msg,
+            'data' => array(
+                    'body' => $message
+                )
+        );
+        
+        $headers = array (
+            'Authorization: key = '.$FIREBASE_SERVER,
+            'Content-Type: application/json'
+        );
+        $ch = curl_init();
+        curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+        curl_setopt( $ch,CURLOPT_POST, true );
+        curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+        curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+        curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+        curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+        
+        $result = curl_exec($ch );
+        curl_close( $ch );
+
+    }
+
+    function send_notification_to_user($user_id,$message){
+
+        if(empty($user_id) || empty($message)){
+            required_field();
+        }else{
+
+            $get_token = mysqli_query(db(),"SELECT token FROM tb_user_fcm_token WHERE user_id = '$user_id'");
+
+            if(mysqli_num_rows($get_token) > 0){
+
+                $token = mysqli_fetch_assoc($get_token)['token'];
+                notification_prepare($token,$message);
+
+            }
+            
+        }
+
+    }
+
+    function save_user_token($user_id,$token){
+
+        if(empty($user_id) || empty($token)){
+            required_field();
+        }else{
+
+            $save = mysqli_query(db(),"REPLACE INTO tb_user_fcm_token VALUES('$user_id','$token')");
+
+            $response['error']=false;
+            $response['pesan']='Token disimpan';
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function remove_user_token($user_id){
+
+        if(empty($user_id)){
+            required_field();
+        }else{
+
+            $remove = mysqli_query(db(),"DELETE FROM tb_user_fcm_token WHERE user_id = '$user_id'");
+
+            $response['error']=false;
+            $response['pesan']='Token dihapus';
+            echo json_encode($response);
+
         }
 
     }
