@@ -16,10 +16,16 @@
             registrasi($login_email,$user_nama_lengkap,$user_no_hp,$user_alamat,$login_pass);
             break;
 
-        case 'login':
+        case 'login_user':
             $login_email = $_POST['login_email'];
             $login_pass = $_POST['login_pass'];
-            login($login_email,$login_pass);
+            login_user($login_email,$login_pass);
+            break;
+
+        case 'login_admin':
+            $login_email = $_POST['login_email'];
+            $login_pass = $_POST['login_pass'];
+            login_admin($login_email,$login_pass);
             break;
 
         case 'update_profile':
@@ -250,13 +256,13 @@
 
     }
 
-    function login($login_email, $login_pass){
+    function login_user($login_email, $login_pass){
 
         if(empty($login_email) || empty($login_pass)){
             required_field();
         }else{
 
-            $login = mysqli_query(db(),"SELECT * FROM tb_login WHERE login_email='$login_email' AND login_pass='$login_pass'");
+            $login = mysqli_query(db(),"SELECT * FROM tb_login WHERE login_email='$login_email' AND login_pass='$login_pass' AND login_lvl='USER'");
 
             if(mysqli_num_rows($login) > 0){
 
@@ -277,6 +283,44 @@
                 $response['user']['user_nama_lengkap']=$user_nama_lengkap;
                 $response['user']['user_alamat']=$user_alamat;
                 $response['user']['user_no_hp']=$user_no_hp;
+
+                echo json_encode($response);
+
+            }else{
+                $response['error']=true;
+                $response['pesan']='Login gagal, Email atau Password salah.';
+                echo json_encode($response);
+            }
+
+        }
+
+    }
+
+    function login_admin($login_email, $login_pass){
+
+        if(empty($login_email) || empty($login_pass)){
+            required_field();
+        }else{
+
+            $login = mysqli_query(db(),"SELECT * FROM tb_login WHERE login_email='$login_email' AND login_pass='$login_pass' AND login_lvl='ADMIN'");
+
+            if(mysqli_num_rows($login) > 0){
+
+                $row_login = mysqli_fetch_assoc($login);
+                $dealer_id = $row_login['dealer_id'];
+                $admin_email = $row_login['login_email'];
+
+                $dealer = mysqli_query(db(),"SELECT * FROM tb_dealer WHERE dealer_id='$dealer_id'");
+                $row_dealer = mysqli_fetch_assoc($dealer);
+                $dealer_nama = $row_dealer['dealer_nama'];
+                $dealer_alamat = $row_dealer['dealer_alamat'];
+
+                $response['error']=false;
+                $response['pesan']='Login sukses.';
+                $response['dealer']['dealer_id']=$dealer_id;
+                $response['dealer']['admin_email']=$admin_email;
+                $response['dealer']['dealer_nama']=$dealer_nama;
+                $response['dealer']['dealer_alamat']=$dealer_alamat;
 
                 echo json_encode($response);
 
