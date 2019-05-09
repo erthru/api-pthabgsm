@@ -355,7 +355,7 @@
 
     }
 
-    function delete_user($user_id){
+    function user_delete($user_id){
         if(empty($user_id)){
             required_field();
         }else{
