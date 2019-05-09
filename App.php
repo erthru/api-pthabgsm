@@ -51,6 +51,11 @@
             user_search($q);
             break;
 
+        case 'user_delete':
+            $user_id = $_GET['user_id'];
+            user_delete($user_id);
+            break;
+
         case 'add_barang_servis':
             $servis_nama = $_POST['servis_nama'];
             $servis_harga = $_POST['servis_harga'];
@@ -348,6 +353,17 @@
 
         }
 
+    }
+
+    function delete_user($user_id){
+        if(empty($user_id)){
+            required_field();
+        }else{
+            $delete = mysqli_query(db(),"DELETE FROM tb_user WHERE user_id='$user_id'");
+            $response['error']=false;
+            $response['pesan']='Pengguna dihapus';
+            echo json_encode($response);
+        }
     }
 
     function add_barang_servis($servis_nama, $servis_harga, $servis_kategori){
