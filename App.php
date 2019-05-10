@@ -205,6 +205,10 @@
             send_notification_to_user($user_id,$message);
             break;
 
+        case 'admin_home_report':
+            admin_home_report();
+            break;
+
         default:
             bad_request();
             break;
@@ -1276,6 +1280,22 @@
             echo json_encode($response);
 
         }
+
+    }
+
+    function admin_home_report(){
+
+        $today = mysqli_query(db(),"SELECT COUNT(*) AS today_b FROM tb_booking WHERE DATE(booking_created_at) = CURDATE()");
+        $week = mysqli_query(db(),"SELECT COUNT(*) AS week_b FROM tb_booking WHERE MONTH(booking_created_at) = MONTH(CURDATE())");
+        $month = mysqli_query(db(),"SELECT COUNT(*) AS month_b FROM tb_booking WHERE YEARWEEK(booking_created_at) = YEARWEEK(CURDATE())");
+        $year = mysqli_query(db(),"SELECT COUNT(*) AS year_b FROM tb_booking WHERE YEAR(booking_created_at) = YEAR(CURDATE())");
+
+        $response['error']=false;
+        $response['booking_hari_ini']=mysqli_fetch_assoc($today)['today_b'];
+        $response['booking_minggu_ini']=mysqli_fetch_assoc($week)['week_b'];
+        $response['booking_bulan_ini']=mysqli_fetch_assoc($month)['month_b'];
+        $response['booking_tahun_ini']=mysqli_fetch_assoc($year)['year_b'];
+        echo json_encode($response);
 
     }
 
