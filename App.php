@@ -810,8 +810,8 @@
             
             FROM tb_booking 
             
-            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
-            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
                         
             ORDER BY tb_booking.booking_id DESC
             
