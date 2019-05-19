@@ -209,6 +209,27 @@
             admin_home_report();
             break;
 
+        case 'booking_ditolak':
+            $booking_id = $_GET['booking_id'];
+            booking_ditolak($booking_id);
+            break;
+
+        case 'set_alasan_booking_ditolak':
+            $booking_id = $_POST['booking_id'];
+            $alasan = $_POST['alasan'];
+            set_alasan_booking_ditolak($booking_id,$alasan);
+            break;
+
+        case 'daftar_tahun':
+            daftar_tahun();
+            break;
+
+        case 'laporan':
+            $bulan = $_GET['bulan'];
+            $tahun = $_GET['tahun'];
+            laporan($bulan,$tahun);
+            break;
+
         default:
             bad_request();
             break;
@@ -480,7 +501,7 @@
             $book_stat = mysqli_query(db(),"INSERT INTO tb_booking_status (booking_status_created_at,booking_id) VALUES (now(),'$book_id')");
 
             $response['error']=false;
-            $response['pesan']='Booking dibuat.';
+            $response['pesan']='Pesanan dibuat.';
             echo json_encode($response);
 
         }
@@ -499,7 +520,7 @@
             send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id diterima.");
 
             $response['error']=false;
-            $response['pesan']='Booking diterima.';
+            $response['pesan']='Pesanan diterima.';
             echo json_encode($response);
 
         }
@@ -596,7 +617,7 @@
             send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id telah dalam pengerjaan.");
 
             $response['error']=false;
-            $response['pesan']='Booking dalam pengerjaan.';
+            $response['pesan']='Pesanan dalam pengerjaan.';
             echo json_encode($response);
 
         }
@@ -614,7 +635,7 @@
             send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id telah selesai.");
 
             $response['error']=false;
-            $response['pesan']='Booking selesai.';
+            $response['pesan']='Pesanan selesai.';
             echo json_encode($response);
 
         }
@@ -630,7 +651,7 @@
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'DITOLAK','$booking_id')");
 
             $response['error']=false;
-            $response['pesan']='Booking ditolak.';
+            $response['pesan']='Pesanan ditolak.';
             echo json_encode($response);
 
         }
@@ -849,10 +870,10 @@
             
             FROM tb_booking 
             
-            LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
-            LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
 
-            WHERE tb_user.user_nama_lengkap LIKE '%$q%' OR tb_booking.booking_id LIKE '%$q%' OR tb_booking.booking_jenis_servis LIKE '%$q%' 
+            WHERE tb_user.user_nama_lengkap LIKE '%$q%' OR tb_booking.booking_id LIKE '%$q%' OR tb_booking.booking_jenis_servis LIKE '%$q%' OR (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) LIKE '%$q%'
                         
             ORDER BY tb_booking.booking_id DESC
 
@@ -1102,9 +1123,11 @@
 
             $today_pesanan = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) as today_pesanan FROM tb_booking WHERE DATE(booking_created_at) = CURDATE() AND user_id='$user_id'"))['today_pesanan'];
 
-            $servis_berjalan = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT MAX(booking_status_stat) FROM tb_booking_status WHERE booking_id = a.booking_id) != 'SELESAI'"));
+            $servis_berjalan = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) != 'SELESAI' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) != 'DITOLAK'"));
 
-            $servis_selesai = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT MAX(booking_status_stat) FROM tb_booking_status WHERE booking_id = a.booking_id) = 'SELESAI'"));
+            $servis_selesai = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) = 'SELESAI'"));
+
+            $servis_ditolak = mysqli_num_rows(mysqli_query(db(),"SELECT a.booking_id FROM tb_booking a WHERE a.user_id = '$user_id' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) = 'DITOLAK'"));
 
             $response['error']=false;
             $response['status']='Sukses';
@@ -1112,6 +1135,7 @@
             $response['report_user']['today_pesanan']=(int)$today_pesanan;
             $response['report_user']['servis_berjalan']=$servis_berjalan;
             $response['report_user']['servis_selesai']=$servis_selesai;
+            $response['report_user']['servis_ditolak']=$servis_ditolak;
             echo json_encode($response);
 
         }
@@ -1297,6 +1321,108 @@
         $response['booking_tahun_ini']=mysqli_fetch_assoc($year)['year_b'];
         echo json_encode($response);
 
+    }
+
+    function booking_ditolak($booking_id){
+
+        if(empty($booking_id)){
+            required_field();
+        }else{
+
+            $alasan = mysqli_fetch_assoc(mysqli_query(db(),"SELECT booking_ditolak_alasan AS alasan FROM tb_booking_ditolak WHERE booking_id='$booking_id' LIMIT 1"))['alasan'];
+
+            if(!$alasan){
+                $response['error']=true;
+                $response['pesan']='Booking ini belum ditolak';
+                echo json_encode($response);
+            }else{
+                $response['error']=false;
+                $response['pesan']=$alasan;
+                echo json_encode($response);
+            }
+
+        }
+
+    }
+
+    function set_alasan_booking_ditolak($booking_id,$alasan){
+
+        if(empty($alasan) || empty($booking_id)){
+            required_field();
+        }else{
+
+            mysqli_query(db(),"INSERT INTO tb_booking_ditolak (booking_ditolak_alasan,booking_id) VALUES('$alasan','$booking_id')");
+
+            $response['error']=false;
+            $response['pesan']='Pesanan ditolak';
+            echo json_encode($response);
+
+        }
+
+    }
+
+    function daftar_tahun(){
+
+        $result = array();
+
+        $tahun = mysqli_query(db(),"SELECT YEAR(booking_created_at) AS year FROM tb_booking GROUP BY year");
+
+        while($row = mysqli_fetch_assoc($tahun)){
+            $result[] = $row;
+        }
+
+        $response['error']=false;
+        $response['pesan']='Sukses';
+        $response['tahun']=$result;
+        echo json_encode($response);
+
+    }
+
+    function laporan($bulan, $tahun){
+        if(empty($bulan) || empty($tahun)){
+            required_field();
+        }else{
+
+            $total_pesanan = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) as total_pesanan FROM tb_booking WHERE YEAR(DATE(booking_created_at))=$tahun AND MONTH(DATE(booking_created_at))=$bulan"))['total_pesanan'];
+
+            $pesanan_berjalan = mysqli_fetch_assoc(mysqli_query(db(),"SELECT count(*) AS pesanan_berjalan FROM tb_booking a WHERE YEAR(DATE(a.booking_created_at))=$tahun AND MONTH(DATE(a.booking_created_at))=$bulan AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) != 'SELESAI' AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) != 'DITOLAK'"))['pesanan_berjalan'];
+
+            $pesanan_selesai = mysqli_fetch_assoc(mysqli_query(db(),"SELECT count(*) AS pesanan_selesai FROM tb_booking a WHERE YEAR(DATE(a.booking_created_at))=$tahun AND MONTH(DATE(a.booking_created_at))=$bulan AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) = 'SELESAI'"))['pesanan_selesai'];
+
+            $pesanan_ditolak = mysqli_fetch_assoc(mysqli_query(db(),"SELECT count(*) AS pesanan_ditolak FROM tb_booking a WHERE YEAR(DATE(a.booking_created_at))=$tahun AND MONTH(DATE(a.booking_created_at))=$bulan AND (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = a.booking_id)) = 'DITOLAK'"))['pesanan_ditolak'];
+
+            $b_all_result = array();
+
+            $b_all = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+
+            WHERE YEAR(DATE(tb_booking.booking_created_at))=$tahun AND MONTH(DATE(tb_booking.booking_created_at))=$bulan
+                        
+            ORDER BY tb_booking.booking_id DESC
+            
+            ");
+
+            while($row = mysqli_fetch_assoc($b_all)){
+                $b_all_result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['total_pesanan']=$total_pesanan;
+            $response['pesanan_berjalan']=$pesanan_berjalan;
+            $response['pesanan_selesai']=$pesanan_selesai;
+            $response['pesanan_ditolak']=$pesanan_ditolak;
+            $response['daftar_pesanan']=$b_all_result;
+            echo json_encode($response);
+
+        }
     }
 
 ?>
