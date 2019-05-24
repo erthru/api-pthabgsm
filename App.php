@@ -393,7 +393,7 @@
 
     function add_barang_servis($servis_nama, $servis_harga, $servis_kategori){
 
-        if(empty($servis_nama) || empty($servis_harga) || empty($servis_kategori)){
+        if(empty($servis_nama) || $servis_harga == "" || empty($servis_kategori)){
             required_field();
         }else{
 
@@ -409,7 +409,7 @@
 
     function update_barang_servis($servis_id, $servis_nama, $servis_harga, $servis_kategori){
 
-        if(empty($servis_id) || empty($servis_nama) || empty($servis_harga) || empty($servis_kategori)){
+        if(empty($servis_id) || empty($servis_nama) || $servis_harga == "" || empty($servis_kategori)){
             required_field();
         }else{
 
@@ -530,7 +530,7 @@
 
     function pemilihan_part_booking($booking_id, $barang_servis_id, $booking_biaya){
 
-        if(empty($booking_id) || empty($barang_servis_id) || empty($booking_biaya)){
+        if(empty($booking_id) || empty($barang_servis_id) || $booking_biaya == ""){
             required_field();
         }else{
 
