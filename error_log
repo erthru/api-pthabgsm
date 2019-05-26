@@ -1,0 +1,98 @@
+[26-May-2019 08:55:05 UTC] PHP Notice:  Undefined index: mod in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 08:56:17 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:56:17 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:56:17 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:56:17 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:56:17 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:56:17 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 08:57:20 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:57:20 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:57:20 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:57:20 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:57:20 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:57:20 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 08:57:29 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:57:29 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:57:29 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:57:29 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:57:29 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:57:29 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 08:57:54 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:57:54 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:57:54 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:57:54 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:57:54 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:57:54 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 08:58:23 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:58:23 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:58:23 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'root'@'localhost' (using password: NO) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:58:23 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:58:23 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:58:23 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 08:59:27 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'erthrupr_root'@'localhost' (using password: YES) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:59:27 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:59:27 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'erthrupr_root'@'localhost' (using password: YES) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:59:27 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:59:27 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:59:27 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 08:59:50 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'erthrupr_root'@'localhost' (using password: YES) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:59:50 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 822
+[26-May-2019 08:59:50 UTC] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'erthrupr_root'@'localhost' (using password: YES) in /home/erthrupr/public_html/pthabgsm/App.php on line 243
+[26-May-2019 08:59:50 UTC] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 826
+[26-May-2019 08:59:50 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 843
+[26-May-2019 08:59:50 UTC] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 849
+[26-May-2019 09:21:47 UTC] PHP Notice:  Undefined variable: con in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 7
+[26-May-2019 09:22:00 UTC] PHP Notice:  Undefined variable: con in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 7
+[26-May-2019 09:22:42 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:22:45 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:23:06 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:23:07 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:23:08 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:23:17 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:23:33 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:23:35 UTC] PHP Fatal error:  Uncaught Error: Using $this when not in object context in /home/erthrupr/public_html/pthabgsm/Koneksi.php:4
+Stack trace:
+#0 {main}
+  thrown in /home/erthrupr/public_html/pthabgsm/Koneksi.php on line 4
+[26-May-2019 09:33:42 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:42 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:43 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:43 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:54 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:54 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:55 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:55 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:56 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:33:56 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:34:04 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:34:04 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:34:35 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:34:35 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:34:36 UTC] PHP Warning:  require_once(Koneksi.php): failed to open stream: No such file or directory in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 09:34:36 UTC] PHP Fatal error:  require_once(): Failed opening required 'Koneksi.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /home/erthrupr/public_html/pthabgsm/App.php on line 3
+[26-May-2019 12:28:46 UTC] PHP Warning:  A non-numeric value encountered in /home/erthrupr/public_html/pthabgsm/App.php on line 453
+[26-May-2019 12:28:46 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 460
+[26-May-2019 12:30:06 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 482
+[26-May-2019 12:38:38 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 482
+[26-May-2019 12:39:08 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 482
