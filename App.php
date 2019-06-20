@@ -234,6 +234,10 @@
             $tahun = $_GET['tahun'];
             laporan($bulan,$tahun);
             break;
+            
+        case 'alert_per_enam_bulan':
+            alert_per_enam_bulan();
+            break;
 
         default:
             bad_request();
@@ -1455,5 +1459,41 @@
 
         }
     }
-
+    
+    function alert_per_enam_bulan(){
+        
+        $alert_to = array();
+        
+        $data = mysqli_query(db(), "
+        
+        SELECT 
+        *, 
+        (SELECT booking_id FROM tb_booking WHERE user_id = tb_user.user_id AND (booking_jenis_servis = 'SBI' OR booking_jenis_servis = 'SBE') ORDER BY booking_id DESC LIMIT 1) AS booking_id_a, 
+        (SELECT booking_status_stat FROM tb_booking_status WHERE booking_id = booking_id_a ORDER BY booking_status_id DESC LIMIT 1) AS last_status,
+        (SELECT booking_status_created_at FROM tb_booking_status WHERE booking_id = booking_id_a ORDER BY booking_status_id DESC LIMIT 1) AS last_status_date,
+        DATEDIFF(CURDATE(),  (SELECT booking_status_created_at FROM tb_booking_status WHERE booking_id = booking_id_a ORDER BY booking_status_id DESC LIMIT 1)) AS date_diff
+        
+        FROM 
+        tb_user
+        
+        HAVING
+        (last_status = 'SELESAI' OR last_status = 'DITOLAK') AND
+        date_diff >= 180 
+        
+        ");
+        
+        while($row = mysqli_fetch_assoc($data)){
+            $alert_to[] = $row;
+        }
+        
+        for($i=0; $i<count($alert_to); $i++){
+            send_notification_to_user($alert_to[$i]["user_id"],"Sudah 6 bulan setelah servis berkala anda di dealer kami. Jangan lupa untuk servis berkala lagi.");
+        }
+        
+        $response['error']=false;
+        $response['message']='list users will get notification';
+        $response['alert_to']=$alert_to;
+        echo json_encode($response);
+        
+    }
 ?>
