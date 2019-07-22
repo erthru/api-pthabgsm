@@ -1217,7 +1217,7 @@
             $limit = 10;
             $limit_start = ($page - 1) * $limit;
 
-            $user = mysqli_query(db(),"SELECT tb_user.*, tb_login.* FROM tb_user LEFT JOIN tb_login ON tb_login.user_id = tb_user.user_id LIMIT $limit_start, $limit");
+            $user = mysqli_query(db(),"SELECT tb_user.*, tb_login.* FROM tb_user LEFT JOIN tb_login ON tb_login.user_id = tb_user.user_id ORDER BY tb_user.user_id DESC LIMIT $limit_start, $limit");
             $result = array();
 
             while($row = mysqli_fetch_assoc($user)){
