@@ -238,6 +238,18 @@
         case 'alert_per_enam_bulan':
             alert_per_enam_bulan();
             break;
+            
+        case 'add_notification':
+            $body = $_POST['body'];
+            $dealer_id = $_POST['dealer_id'];
+            add_notification($body, $dealer_id);
+            break;
+            
+        case 'load_notification':
+            $page = $_GET['page'];
+            $dealer_id = $_GET['dealer_id'];
+            load_notification($page, $dealer_id);
+            break;   
 
         default:
             bad_request();
@@ -1494,6 +1506,45 @@
         $response['message']='list users will get notification';
         $response['alert_to']=$alert_to;
         echo json_encode($response);
+        
+    }
+    
+    function add_notification($body, $dealer_id){
+        
+       if (empty($body) || empty($dealer_id)){
+           required_field();
+       }else{
+            mysqli_query(db(), "INSERT INTO tb_notification (notification_body, dealer_id) VALUES ('$body','$dealer_id')");
+        
+            $response['error']=false;
+            $response['message']='notification ditambahkan';
+            echo json_encode($response);
+       }
+        
+    }
+    
+    function load_notification($page, $dealer_id){
+        
+        if (empty($page) || empty($dealer_id)){
+            required_field();
+        }else{
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit;
+            
+            $notifications = array();
+            
+            $data = mysqli_query(db(), "SELECT * FROM tb_notification WHERE dealer_id = '$dealer_id' ORDER BY notification_id DESC LIMIT $limit_start, $limit");
+            
+            while($row = mysqli_fetch_assoc($data)){
+                $notifications[] = $row;
+            }
+            
+            $response['error']=false;
+            $response['message']='berhasil';
+            $response['total']=mysqli_num_rows($data);
+            $response['notifications']=$notifications;
+            echo json_encode($response);
+        }
         
     }
 ?>
