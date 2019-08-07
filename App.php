@@ -99,8 +99,9 @@
             $booking_vincode = $_POST['booking_vincode'];
             $booking_km = $_POST['booking_km'];
             $booking_no_polisi = $_POST['booking_no_polisi'];
+            $booking_jadwal_servis = $_POST['booking_jadwal_servis'];
             $booking_keterangan = $_POST['booking_keterangan'];
-            start_booking($booking_jenis_servis, $booking_model_kendaraan, $booking_vincode, $booking_km, $booking_no_polisi, $user_id, $dealer_id, $booking_keterangan);
+            start_booking($booking_jenis_servis, $booking_model_kendaraan, $booking_vincode, $booking_km, $booking_no_polisi, $booking_jadwal_servis, $user_id, $dealer_id, $booking_keterangan);
             break;
 
         case 'terima_booking':
@@ -535,21 +536,31 @@
         }
     }
 
-    function start_booking($booking_jenis_servis, $booking_model_kendaraan, $booking_vincode, $booking_km, $booking_no_polisi, $user_id, $dealer_id, $booking_keterangan){
+    function start_booking($booking_jenis_servis, $booking_model_kendaraan, $booking_vincode, $booking_km, $booking_no_polisi, $booking_jadwal_servis, $user_id, $dealer_id, $booking_keterangan){
 
-        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis) || empty($booking_keterangan) || empty($booking_model_kendaraan) || empty($booking_vincode) || empty($booking_km) || empty($booking_no_polisi)){
+        if(empty($user_id) || empty($dealer_id) || empty($booking_jenis_servis) || empty($booking_keterangan) || empty($booking_model_kendaraan) || empty($booking_vincode) || empty($booking_km) || empty($booking_no_polisi) || empty($booking_jadwal_servis)){
             required_field();
         }else{
 
-            $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_model_kendaraan,booking_vincode,booking_km,booking_no_polisi,booking_keterangan,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', '$booking_model_kendaraan', '$booking_vincode', '$booking_km', '$booking_no_polisi', '$booking_keterangan',now(), '$user_id', '$dealer_id')");
+            $curdate = mysqli_fetch_assoc(mysqli_query(db(), "SELECT CURDATE() as CURRENT_DD"))['CURRENT_DD'];
+            
+            if ($curdate >= $booking_jadwal_servis){
+                
+                $response['error']=true;
+                $response['pesan']='Tanggal servis minimal besok.';
+                echo json_encode($response);
+                
+            }else{
+                $book = mysqli_query(db(), "INSERT INTO tb_booking (booking_jenis_servis,booking_model_kendaraan,booking_vincode,booking_km,booking_no_polisi,booking_jadwal_servis,booking_keterangan,booking_created_at,user_id,dealer_id) VALUES ('$booking_jenis_servis', '$booking_model_kendaraan', '$booking_vincode', '$booking_km', '$booking_no_polisi','$booking_jadwal_servis','$booking_keterangan',now(), '$user_id', '$dealer_id')");
 
-            $book_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT MAX(booking_id) as booking_id FROM tb_booking"))['booking_id'];
-
-            $book_stat = mysqli_query(db(),"INSERT INTO tb_booking_status (booking_status_created_at,booking_id) VALUES (now(),'$book_id')");
-
-            $response['error']=false;
-            $response['pesan']='Pesanan dibuat.';
-            echo json_encode($response);
+                $book_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT MAX(booking_id) as booking_id FROM tb_booking"))['booking_id'];
+    
+                $book_stat = mysqli_query(db(),"INSERT INTO tb_booking_status (booking_status_created_at,booking_id) VALUES (now(),'$book_id')");
+    
+                $response['error']=false;
+                $response['pesan']='Pesanan dibuat.';
+                echo json_encode($response);
+            }
 
         }
 
@@ -779,6 +790,7 @@
             $booking_vincode = null;
             $booking_km = null;
             $booking_no_polisi = null;
+            $booking_jadwal_servis = null;
             $booking_keterangan = null;
             $booking_biaya = null;
             $booking_created_at = null;
@@ -800,6 +812,7 @@
                 $booking_vincode = $row['booking_vincode'];
                 $booking_km = $row['booking_km'];
                 $booking_no_polisi = $row['booking_no_polisi'];
+                $booking_jadwal_servis = $row['booking_jadwal_servis'];
                 $booking_keterangan = $row['booking_keterangan'];
                 $booking_biaya = $row['booking_biaya'];
                 $booking_created_at = $row['booking_created_at'];
@@ -825,6 +838,7 @@
             $response['data_booking']['booking_vincode']=$booking_vincode;
             $response['data_booking']['booking_km']=$booking_km;
             $response['data_booking']['booking_no_polisi']=$booking_no_polisi;
+            $response['data_booking']['booking_jadwal_servis']=$booking_jadwal_servis;
             $response['data_booking']['booking_keterangan']=$booking_keterangan;
             $response['data_booking']['booking_biaya']=$booking_biaya;
             $response['data_booking']['booking_created_at']=$booking_created_at;

@@ -1,5 +1,2 @@
 
-[02-Aug-2019 05:14:49 UTC] PHP Notice:  Undefined index: page in /home/erthrupr/public_html/pthabgsm/App.php on line 249
-[02-Aug-2019 05:14:49 UTC] PHP Notice:  Undefined index: dealer_id in /home/erthrupr/public_html/pthabgsm/App.php on line 250
-[02-Aug-2019 05:15:00 UTC] PHP Notice:  Undefined index: page in /home/erthrupr/public_html/pthabgsm/App.php on line 249
-[02-Aug-2019 05:15:00 UTC] PHP Notice:  Undefined index: dealer_id in /home/erthrupr/public_html/pthabgsm/App.php on line 250
+[07-Aug-2019 13:05:18 UTC] PHP Notice:  Undefined index: page in /home/erthrupr/public_html/pthabgsm/App.php on line 152
