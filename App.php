@@ -251,6 +251,47 @@
             $dealer_id = $_GET['dealer_id'];
             load_notification($page, $dealer_id);
             break;   
+            
+        case 'add_teknisi':
+            $nama = $_POST['nama'];
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+            add_teknisi($nama, $email, $password);
+            break;
+            
+        case 'update_teknisi':
+            $id = $_POST['id'];
+            $nama = $_POST['nama'];
+            $email = $_POST['email'];
+            update_teknisi($id, $nama, $email);
+            break;
+            
+        case 'update_password_teknisi':
+            $id = $_POST['id'];
+            $password = $_POST['password'];
+            update_password_teknisi($id, $password);
+            break;
+            
+        case 'delete_teknisi':
+            $id = $_POST['id'];
+            delete_teknisi($id);
+            break;
+            
+        case 'login_teknisi':
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+            login_teknisi($email, $password);
+            break;
+            
+        case 'get_teknisi':
+            $id = $_GET['id'];
+            get_teknisi($id);
+            break;
+            
+        case 'list_teknisi':
+            $page = $_GET['page'];
+            list_teknisi($page);
+            break;
 
         default:
             bad_request();
@@ -1558,6 +1599,148 @@
             $response['total']=mysqli_num_rows($data);
             $response['notifications']=$notifications;
             echo json_encode($response);
+        }
+        
+    }
+    
+    function add_teknisi($nama, $email, $password){
+        
+        if (empty($nama) || empty($email) || empty($password)){
+            required_field();
+        }else{
+            
+            $check = mysqli_query(db(), "SELECT teknisi_email FROM tb_teknisi WHERE teknisi_email = '$email'");
+            
+            if (mysqli_num_rows($check) > 0){
+                $response['error']=true;
+                $response['message']='email telah terdaftar';
+                echo json_encode($response);
+            }else{
+                mysqli_query(db(), "INSERT INTO tb_teknisi (teknisi_nama,teknisi_email,teknisi_password) VALUES ('$nama','$email','$password')");
+                
+                $response['error']=false;
+                $response['message']='berhasil';
+                echo json_encode($response);
+            }
+            
+        }
+        
+    }
+    
+    function update_teknisi($id, $nama, $email){
+        
+        if (empty($nama) || empty($email)){
+            required_field();
+        }else{
+            
+            $current_email = mysqli_fetch_assoc(mysqli_query(db(), "SELECT teknisi_email FROM tb_teknisi WHERE teknisi_id = '$id'"))['teknisi_email'];
+            
+            $check = mysqli_query(db(), "SELECT teknisi_email FROM tb_teknisi WHERE teknisi_email = '$email' AND teknisi_email != '$current_email'");
+            
+            if (mysqli_num_rows($check) > 0){
+                $response['error']=true;
+                $response['message']='email telah terdaftar';
+                echo json_encode($response);
+            }else{
+                mysqli_query(db(), "UPDATE tb_teknisi SET teknisi_nama = '$nama', teknisi_email = '$email' WHERE teknisi_id = '$id'");
+                
+                $response['error']=false;
+                $response['message']='berhasil';
+                echo json_encode($response);
+            }
+            
+        }
+        
+    }
+    
+    function update_password_teknisi($id, $password){
+        
+        if (empty($id) || empty($password)){
+            required_field();
+        }else{
+            
+            mysqli_query(db(), "UPDATE tb_teknisi SET teknisi_password = '$password' WHERE teknisi_id = '$id'");
+            
+            $response['error']=false;
+            $response['message']='berhasil';
+            echo json_encode($response);
+            
+        }
+        
+    }
+    
+    function delete_teknisi($id){
+        
+        if (empty($id)){
+            required_field();
+        }else{
+             
+            mysqli_query(db(), "DELETE FROM tb_teknisi WHERE teknisi_id = '$id'");
+             
+            $response['error']=false;
+            $response['message']='berhasil';
+            echo json_encode($response);
+        }
+        
+    }
+    
+    function login_teknisi($email, $password){
+        
+        if (empty($email) || empty($password)){
+            required_field();
+        }else{
+            
+            $login = mysqli_query(db(), "SELECT * FROM tb_teknisi WHERE teknisi_email = '$email' AND teknisi_password = '$password'");
+            
+            if (mysqli_num_rows($login) > 0){
+                $response['error']=false;
+                $response['message']='berhasil';
+                echo json_encode($response);
+            }else{
+                $response['error']=true;
+                $response['message']='login gagal, periksa email atau password';
+                echo json_encode($response);
+            }
+            
+        }
+        
+    }
+    
+    function get_teknisi($id){
+        
+        if(empty($id)){
+            required_field();
+        }else{
+            
+            $teknisi = mysqli_query(db(),"SELECT * FROM tb_teknisi WHERE teknisi_id = '$id'");
+            
+            $response['error']=false;
+            $response['teknisi']=mysqli_fetch_assoc($teknisi);
+            echo json_encode($response);
+        }
+        
+    }
+    
+    function list_teknisi($page){
+        
+        if (empty($page)){
+            required_field();
+        }else{
+            
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit;
+            
+            $teknisis = array();
+            
+            $data = mysqli_query(db(), "SELECT * FROM tb_teknisi ORDER BY teknisi_id DESC LIMIT $limit_start, $limit");
+            while($row = mysqli_fetch_assoc($data)){
+                $teknisis[] = $row;
+            }
+            
+            $response['error']=false;
+            $response['teknisis']=$teknisis;
+            echo json_encode($response);
+            
         }
         
     }
