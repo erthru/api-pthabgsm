@@ -1737,7 +1737,10 @@
                 $teknisis[] = $row;
             }
             
+            $total = mysqli_query(db(), "SELECT * FROM tb_teknisi");
+            
             $response['error']=false;
+            $response['total']=mysqli_num_rows($total);
             $response['teknisis']=$teknisis;
             echo json_encode($response);
             
