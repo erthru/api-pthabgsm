@@ -812,12 +812,14 @@
             SELECT tb_booking.*,
             tb_dealer.*,
             tb_user.*,
+            tb_teknisi.*,
             (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
             
             FROM tb_booking 
             
             LEFT JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
             LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            LEFT JOIN tb_teknisi ON tb_teknisi.teknisi_id = tb_booking.teknisi_id
             
             WHERE tb_booking.booking_id = '$booking_id' 
             
@@ -845,6 +847,9 @@
             $user_created_at = null;
             $user_updated_at = null;
             $last_status = null;
+            $teknisi_id = null;
+            $teknisi_nama = null;
+            $teknisi_email = null;
 
             while($row = mysqli_fetch_assoc($bu)){
                 $booking_id = $row['booking_id'];
@@ -867,6 +872,9 @@
                 $user_created_at = $row['user_created_at'];
                 $user_updated_at = $row['user_updated_at'];
                 $last_status = $row['last_status'];
+                $teknisi_id = $row['teknisi_id'];
+                $teknisi_nama = $row['teknisi_nama'];
+                $teknisi_email = $row['teknisi_email'];
             }
 
             $get_user_name = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_nama_lengkap FROM tb_user WHERE user_id = '$user_id'"))['user_nama_lengkap'];
@@ -893,6 +901,9 @@
             $response['data_booking']['user_created_at']=$user_created_at;
             $response['data_booking']['user_updated_at']=$user_updated_at;
             $response['data_booking']['last_status']=$last_status;
+            $response['data_booking']['teknisi_id']=$teknisi_id;
+            $response['data_booking']['teknisi_nama']=$teknisi_nama;
+            $response['data_booking']['teknisi_email']=$teknisi_email;
             echo json_encode($response);
 
         }
