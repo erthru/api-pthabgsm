@@ -1706,6 +1706,7 @@
             if (mysqli_num_rows($login) > 0){
                 $response['error']=false;
                 $response['message']='berhasil';
+                $response['teknisi_id']=mysqli_fetch_assoc($login)['teknisi_id'];
                 echo json_encode($response);
             }else{
                 $response['error']=true;

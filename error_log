@@ -49,3 +49,4 @@
 [21-Aug-2019 12:30:32 UTC] PHP Warning:  mysqli_query() expects at least 2 parameters, 1 given in /home/erthrupr/public_html/pthabgsm/App.php on line 1710
 [21-Aug-2019 12:30:32 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, null given in /home/erthrupr/public_html/pthabgsm/App.php on line 1713
 [21-Aug-2019 12:34:14 UTC] PHP Notice:  Undefined index: page in /home/erthrupr/public_html/pthabgsm/App.php on line 292
+[27-Aug-2019 02:25:18 UTC] PHP Notice:  Undefined index: booking_jadwal_servis in /home/erthrupr/public_html/pthabgsm/App.php on line 102
