@@ -1785,7 +1785,7 @@
             
             $response['error']=false;
             $response['total']=mysqli_num_rows($total);
-            $response['diterima']=$bookings;
+            $response['bookings']=$bookings;
             echo json_encode($response);
         }
         
