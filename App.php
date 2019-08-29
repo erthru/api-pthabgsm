@@ -292,6 +292,11 @@
             $page = $_GET['page'];
             list_teknisi($page);
             break;
+            
+        case 'list_booking_for_teknisi':
+            $page = $_GET['page'];
+            list_booking_for_teknisi($page);
+            break;
 
         default:
             bad_request();
@@ -1756,6 +1761,32 @@
             $response['teknisis']=$teknisis;
             echo json_encode($response);
             
+        }
+        
+    }
+    
+    function list_booking_for_teknisi($page){
+        
+        if(empty($page)){
+            required_field();
+        }else{
+            
+            $limit = 10;
+            $limit_start = ($page - 1) * $limit;
+            
+            $bookings = array();
+            
+            $lists = mysqli_query(db(), "SELECT tb_booking.*, tb_user.*, (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status FROM tb_booking LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id HAVING last_status != 'BELUM DIPROSES' AND last_status != 'SELESAI' AND last_status != 'DITOLAK' ORDER BY tb_booking.booking_id DESC LIMIT $limit_start, $limit");
+            while($row = mysqli_fetch_assoc($lists)){
+                $bookings[] = $row;
+            }
+            
+            $total = mysqli_query(db(), "SELECT tb_booking.*, tb_user.*, (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status FROM tb_booking LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id HAVING last_status != 'BELUM DIPROSES' AND last_status != 'SELESAI' AND last_status != 'DITOLAK' ORDER BY tb_booking.booking_id DESC");
+            
+            $response['error']=false;
+            $response['total']=mysqli_num_rows($total);
+            $response['diterima']=$bookings;
+            echo json_encode($response);
         }
         
     }
