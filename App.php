@@ -302,6 +302,12 @@
             $page = $_GET['page'];
             list_booking_for_teknisi($page);
             break;
+            
+        case 'set_teknisi':
+            $booking_id = $_POST['booking_id'];
+            $teknisi_id = $_POST['teknisi_id'];
+            set_teknisi($booking_id, $teknisi_id);
+            break;
 
         default:
             bad_request();
@@ -1219,16 +1225,36 @@
             ORDER BY tb_booking_item.booking_item_id DESC
             
             ");
+            
+            $bi_false = mysqli_query(db(), "
+            SELECT tb_booking_item.*,
+            tb_barang_servis.* 
+            
+            FROM tb_booking_item 
+            
+            LEFT JOIN tb_barang_servis ON tb_barang_servis.barang_servis_id = tb_booking_item.barang_servis_id 
+            
+            WHERE tb_booking_item.booking_id = '$booking_id' AND tb_booking_item.booking_item_status = 'DITOLAK' 
+            
+            ORDER BY tb_booking_item.booking_item_id DESC
+            
+            ");
 
             $result = array();
+            $result_false = array();
 
             while($row = mysqli_fetch_assoc($bi)){
                 $result[] = $row;
+            }
+            
+            while($row = mysqli_fetch_assoc($bi_false)){
+                $result_false[] = $row;
             }
 
             $response['error']=false;
             $response['status']='Sukses';
             $response['booking_item']=$result;
+            $response['booking_item_ditolak']=$result_false;
             echo json_encode($response);
 
         }
@@ -1813,6 +1839,21 @@
             $response['error']=false;
             $response['total']=mysqli_num_rows($total);
             $response['bookings']=$bookings;
+            echo json_encode($response);
+        }
+        
+    }
+    
+    function set_teknisi($booking_id, $teknisi_id){
+        
+        if (empty($booking_id || empty($teknisi_id))){
+            required_field();
+        }else{
+            
+            mysqli_query(db(),"UPDATE tb_booking SET teknisi_id = '$teknisi_id' WHERE booking_id = '$booking_id'");
+            
+            $response['error']=false;
+            $response['message']='Berhasil memproses servis.';
             echo json_encode($response);
         }
         
