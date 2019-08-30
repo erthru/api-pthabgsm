@@ -85,6 +85,11 @@
             $page = $_GET['page'];
             daftar_barang_servis_by_jenis($jenis,$page);
             break;
+            
+        case 'daftar_barang_servis_by_jenis_non_paging':
+            $jenis = $_GET['jenis'];
+            daftar_barang_servis_by_jenis_non_paging($jenis);
+            break;
 
         case 'search_barang_servis':
             $q = $_GET['q'];
@@ -542,6 +547,28 @@
             $limit_start = ($page - 1) * $limit; 
 
             $daftar = mysqli_query(db(),"SELECT * FROM tb_barang_servis WHERE barang_servis_kategori = '$jenis' ORDER BY barang_servis_id DESC LIMIT $limit_start,$limit");
+            $total = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) AS total FROM tb_barang_servis WHERE barang_servis_kategori = '$jenis'"))['total'];
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($daftar)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['total']=$total;
+            $response['daftar_barang_servis']=$result;
+            echo json_encode($response);
+
+        }
+    }
+    
+    function daftar_barang_servis_by_jenis_non_paging($jenis){
+        if(empty($jenis)){
+            required_field();
+        }else{
+            $daftar = mysqli_query(db(),"SELECT * FROM tb_barang_servis WHERE barang_servis_kategori = '$jenis' ORDER BY barang_servis_id DESC");
             $total = mysqli_fetch_assoc(mysqli_query(db(),"SELECT COUNT(*) AS total FROM tb_barang_servis WHERE barang_servis_kategori = '$jenis'"))['total'];
 
             $result = array();
