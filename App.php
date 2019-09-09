@@ -308,6 +308,12 @@
             $teknisi_id = $_POST['teknisi_id'];
             set_teknisi($booking_id, $teknisi_id);
             break;
+            
+        case 'send_notification_topic':
+            $topic = $_POST['topic'];
+            $message = $_POST['message'];
+            send_notification_topic($topic,$message);
+            break;
 
         default:
             bad_request();
@@ -479,7 +485,7 @@
             $add = mysqli_query(db(),"INSERT INTO tb_barang_servis (barang_servis_nama,barang_servis_harga,barang_servis_kategori,barang_servis_updated_at) VALUES ('$servis_nama','$servis_harga','$servis_kategori',now())");
 
             $response['error']=false;
-            $response['pesan']='Barang servis ditambahkan.';
+            $response['pesan']='Sparepart servis ditambahkan.';
             echo json_encode($response);
 
         }
@@ -495,7 +501,7 @@
             $update = mysqli_query(db(),"UPDATE tb_barang_servis SET barang_servis_nama='$servis_nama', barang_servis_harga='$servis_harga', barang_servis_kategori='$servis_kategori', barang_servis_updated_at = now() WHERE barang_servis_id='$servis_id'");
 
             $response['error']=false;
-            $response['pesan']='Barang servis diperbarui.';
+            $response['pesan']='Sparepart servis diperbarui.';
             echo json_encode($response);
 
         }
@@ -511,7 +517,7 @@
             $del = mysqli_query(db(),"DELETE FROM tb_barang_servis WHERE barang_servis_id = '$servis_id'");
 
             $response['error']=false;
-            $response['pesan']='Barang servis dihapus';
+            $response['pesan']='Sparepart servis dihapus';
             echo json_encode($response);
 
         }
@@ -655,6 +661,7 @@
 
             $user_id = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_id FROM tb_booking WHERE booking_id='$booking_id' LIMIT 1"))['user_id'];
             send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id diterima.");
+            send_notification_topic('teknisi', "Terdapat pesanan baru yang telah diterima oleh pihak admin.");
 
             $response['error']=false;
             $response['pesan']='Pesanan diterima.';
@@ -786,6 +793,10 @@
         }else{
 
             $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'DITOLAK','$booking_id')");
+
+            $user_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT user_id FROM tb_booking WHERE booking_id = '$booking_id' LIMIT 1"))['user_id'];
+            
+            send_notification_to_user($user_id, "Booking pesanan dengan nomor invoice #$booking_id ditolak.");
 
             $response['error']=false;
             $response['pesan']='Pesanan ditolak.';
@@ -1426,6 +1437,41 @@
         curl_close( $ch );
 
     }
+    
+    function notification_topic_prepare($topic,$message){
+
+        $FIREBASE_SERVER = 'AAAACQ_QVi0:APA91bE0AzxMVfyMZgQEZYRxyjB-DA3VRNj9AIrbTqmakw63DDRvB1a4WdcAPkYxiMruVH-kHi_30bAMce1izs8k_RkwHdxbHDzuLy-PeShdSGWSv0cm6B8h4IsqNg1HJi97LVe7AVU8';
+
+        $msg = array(
+        'body' 	=> $message,
+                'icon'	=> 'myicon',
+                'sound' => 'mySound'
+        );
+        
+        $fields = array(
+            'to'		=> '/topics/'.$topic,
+            'notification'	=> $msg,
+            'data' => array(
+                    'body' => $message
+                )
+        );
+        
+        $headers = array (
+            'Authorization: key = '.$FIREBASE_SERVER,
+            'Content-Type: application/json'
+        );
+        $ch = curl_init();
+        curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+        curl_setopt( $ch,CURLOPT_POST, true );
+        curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+        curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+        curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+        curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+        
+        $result = curl_exec($ch );
+        curl_close( $ch );
+
+    }
 
     function send_notification_to_user($user_id,$message){
 
@@ -1444,6 +1490,18 @@
             
         }
 
+    }
+    
+    function send_notification_topic($topic, $message){
+        
+        if(empty($topic) || empty($message)){
+            required_field();
+        }else{
+            
+            notification_topic_prepare($topic,$message);
+
+        }
+        
     }
 
     function save_user_token($user_id,$token){
