@@ -693,6 +693,7 @@
             $user_id = mysqli_fetch_assoc(mysqli_query(db(),"SELECT user_id FROM tb_booking WHERE booking_id='$booking_id' LIMIT 1"))['user_id'];
             send_notification_to_user($user_id, "Booking dengan nomor invoice #$booking_id. Telah ditentukan sparepart/item servis yang akan digunakan.");
 
+
             $response['error']=false;
             $response['pesan']='Pemilihan part untuk user diset. Menunggu user memilih part yang akan diservis.';
             echo json_encode($response);
@@ -733,6 +734,8 @@
                     }
     
                     $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
+                    
+                    send_notification_topic("teknisi", "Pesanan dengan invoice #$booking_id telah memilih sparepart yang ingin digunakan.");
     
                     $response['error']=false;
                     $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
