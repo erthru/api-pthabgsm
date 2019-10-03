@@ -169,6 +169,12 @@
             $q = $_GET['q'];
             search_booking_all($q);
             break;
+            
+        case 'riwayat_booking_all':
+            $date_b = $_GET['date_b'];
+            $date_a = $_GET['date_a'];
+            riwayat_booking_all($date_b, $date_a);
+            break;
 
         case 'riwayat_booking_user':
             $user_id = $_GET['user_id'];
@@ -981,6 +987,8 @@
             
             JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
             JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            HAVING last_status != 'SELESAI' AND last_status != 'DITOLAK'
                         
             ORDER BY tb_booking.booking_id DESC
 
@@ -998,7 +1006,24 @@
             
             JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
             JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            HAVING last_status != 'SELESAI' AND last_status != 'DITOLAK'
                         
+            ORDER BY tb_booking.booking_id DESC
+            
+            ");
+            
+            $totalwhaving = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
             ORDER BY tb_booking.booking_id DESC
             
             ");
@@ -1012,6 +1037,7 @@
             $response['error']=false;
             $response['pesan']='Sukses';
             $response['total']=mysqli_num_rows($total);
+            $response['total_whaving']=mysqli_num_rows($totalwhaving);
             $response['data_booking']=$result;
             echo json_encode($response);
 
@@ -1040,6 +1066,8 @@
 
             WHERE tb_user.user_nama_lengkap LIKE '%$q%' OR tb_booking.booking_id LIKE '%$q%' OR tb_booking.booking_jenis_servis LIKE '%$q%' OR (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) LIKE '%$q%'
                         
+            HAVING last_status != 'SELESAI' AND last_status != 'DITOLAK'
+            
             ORDER BY tb_booking.booking_id DESC
 
             LIMIT $limit
@@ -1083,6 +1111,8 @@
             
             WHERE (DATE(tb_booking.booking_created_at) BETWEEN '$date_b' AND '$date_a') 
             
+            HAVING last_status != 'SELESAI' AND last_status != 'DITOLAK'
+            
             GROUP BY tb_booking.booking_id 
             
             ORDER BY tb_booking.booking_id DESC 
@@ -1104,6 +1134,8 @@
             
             WHERE (DATE(tb_booking.booking_created_at) BETWEEN '$date_b' AND '$date_a') 
             
+            HAVING last_status != 'SELESAI' AND last_status != 'DITOLAK'
+            
             ");
 
             $result = array();
@@ -1120,6 +1152,47 @@
 
         }
 
+    }
+    
+    function riwayat_booking_all($date_b, $date_a){
+        
+        if(empty($date_b) || empty($date_a)){
+            required_field();
+        }else{
+
+            $bu = mysqli_query(db(), "
+            SELECT tb_booking.*,
+            tb_dealer.*,
+            tb_user.*,
+            (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status  
+            
+            FROM tb_booking 
+            
+            JOIN tb_dealer ON tb_dealer.dealer_id = tb_booking.dealer_id 
+            JOIN tb_user ON tb_user.user_id = tb_booking.user_id 
+            
+            WHERE (DATE(tb_booking.booking_created_at) BETWEEN '$date_b' AND '$date_a')
+            
+            HAVING last_status = 'SELESAI' OR last_status = 'DITOLAK' 
+            
+            ORDER BY tb_booking.booking_id DESC
+
+            ");
+
+
+            $result = array();
+
+            while($row = mysqli_fetch_assoc($bu)){
+                $result[] = $row;
+            }
+
+            $response['error']=false;
+            $response['pesan']='Sukses';
+            $response['data_booking']=$result;
+            echo json_encode($response);
+
+        }
+        
     }
 
     function riwayat_booking_user($user_id,$page){
