@@ -251,6 +251,10 @@
             alert_per_enam_bulan();
             break;
             
+        case 'alert_batas_waktu':
+            alert_batas_waktu();
+            break;
+            
         case 'add_notification':
             $body = $_POST['body'];
             $dealer_id = $_POST['dealer_id'];
@@ -810,6 +814,22 @@
             $response['error']=false;
             $response['pesan']='Pesanan ditolak.';
             echo json_encode($response);
+
+        }
+
+    }
+    
+    function ditolak_booking_wresponse($booking_id){
+
+        if(empty($booking_id)){
+            required_field();
+        }else{
+
+            $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'DITOLAK','$booking_id')");
+
+            $user_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT user_id FROM tb_booking WHERE booking_id = '$booking_id' LIMIT 1"))['user_id'];
+            
+            send_notification_to_user($user_id, "Booking pesanan dengan nomor invoice #$booking_id ditolak.");
 
         }
 
@@ -1649,6 +1669,8 @@
         }
 
     }
+    
+    
 
     function set_alasan_booking_ditolak($booking_id,$alasan){
 
@@ -1661,6 +1683,18 @@
             $response['error']=false;
             $response['pesan']='Pesanan ditolak';
             echo json_encode($response);
+
+        }
+
+    }
+    
+    function set_alasan_booking_ditolak_wresponse($booking_id,$alasan){
+
+        if(empty($alasan) || empty($booking_id)){
+            required_field();
+        }else{
+
+            mysqli_query(db(),"INSERT INTO tb_booking_ditolak (booking_ditolak_alasan,booking_id) VALUES('$alasan','$booking_id')");
 
         }
 
@@ -1758,6 +1792,49 @@
         
         for($i=0; $i<count($alert_to); $i++){
             send_notification_to_user($alert_to[$i]["user_id"],"Sudah 6 bulan setelah servis berkala anda di dealer kami. Jangan lupa untuk servis berkala lagi.");
+        }
+        
+        $response['error']=false;
+        $response['message']='list users will get notification';
+        $response['alert_to']=$alert_to;
+        echo json_encode($response);
+        
+    }
+    
+    function alert_batas_waktu(){
+        
+        $alert_to = array();
+        
+        $data = mysqli_query(db(), 
+        "SELECT *, 
+        (SELECT booking_status_stat FROM tb_booking_status WHERE booking_status_id = (SELECT MAX(tb_booking_status.booking_status_id) FROM tb_booking_status WHERE booking_id = tb_booking.booking_id)) AS last_status
+        
+        FROM tb_booking
+        
+        LEFT JOIN tb_user ON tb_user.user_id = tb_booking.user_id
+        
+        WHERE booking_jadwal_servis = CURDATE()
+        
+        HAVING last_status = 'BELUM DIPROSES' OR last_status = 'DITERIMA'
+        
+        ORDER BY booking_id DESC");
+        
+        while($row = mysqli_fetch_assoc($data)){
+            $alert_to[] = $row;
+        }
+        
+        foreach($alert_to as $to){
+            
+            ditolak_booking_wresponse($to['booking_id']);
+            
+            $alasan = "Melebihi batas waktu.";
+            
+            if($to['last_status'] == 'DITERIMA'){
+                $alasan = "Pesanan telah diterima, tapi pelanggan tidak datang ke dealer untuk konfirmasi";
+            }
+            
+            set_alasan_booking_ditolak_wresponse($to['booking_id'],$alasan);
+            
         }
         
         $response['error']=false;
