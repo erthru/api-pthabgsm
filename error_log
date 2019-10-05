@@ -56,3 +56,9 @@
 [03-Oct-2019 05:00:36 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 1167
 [03-Oct-2019 05:38:17 UTC] PHP Notice:  Undefined index: page in /home/erthrupr/public_html/pthabgsm/App.php on line 157
 [05-Oct-2019 06:14:37 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
+[05-Oct-2019 07:12:54 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
+[05-Oct-2019 07:14:52 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
+[05-Oct-2019 07:15:22 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
+[05-Oct-2019 07:16:24 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
+[05-Oct-2019 07:17:23 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
+[05-Oct-2019 07:17:50 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
