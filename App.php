@@ -324,6 +324,14 @@
             $message = $_POST['message'];
             send_notification_topic($topic,$message);
             break;
+            
+        case 'daftar_notifikasi_admin':
+            daftar_notifikasi_admin();
+            break;
+            
+        case 'baca_notifikasi_admin':
+            baca_notifikasi_admin();
+            break;
 
         default:
             bad_request();
@@ -651,6 +659,8 @@
                 $book_id = mysqli_fetch_assoc(mysqli_query(db(), "SELECT MAX(booking_id) as booking_id FROM tb_booking"))['booking_id'];
     
                 $book_stat = mysqli_query(db(),"INSERT INTO tb_booking_status (booking_status_created_at,booking_id) VALUES (now(),'$book_id')");
+                
+                mysqli_query(db(),"INSERT INTO tb_notification (notification_body,notification_unread) VALUES ('Pesanan baru dengan no. invoice #$book_id', '1')");
     
                 $response['error']=false;
                 $response['pesan']='Pesanan dibuat.';
@@ -722,6 +732,8 @@
             if(empty($unselected_booking_item_id)){
                 $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
     
+                mysqli_query(db(),"INSERT INTO tb_notification (notification_body,notification_unread) VALUES ('Pesanan dengan no. invoice #$book_id telah memilih sparepart yang ingin digunakan, pesanan telah diteruskan ke teknisi', '1')");
+
                 $response['error']=false;
                 $response['pesan']='Pemilihan part diset. Menunggu persetujuan dari pihak dealer.';
                 echo json_encode($response);
@@ -745,6 +757,8 @@
     
                     $ppb = mysqli_query(db(), "INSERT INTO tb_booking_status (booking_status_created_at,booking_status_stat,booking_id) VALUES (now(),'MENUNGGU PERSETUJUAN','$booking_id')");
                     
+                    mysqli_query(db(),"INSERT INTO tb_notification (notification_body,notification_unread) VALUES ('Pesanan dengan no. invoice #$book_id telah memilih sparepart yang ingin digunakan, pesanan telah diteruskan ke teknisi', '1')");
+
                     send_notification_topic("teknisi", "Pesanan dengan invoice #$booking_id telah memilih sparepart yang ingin digunakan.");
     
                     $response['error']=false;
@@ -2067,6 +2081,35 @@
             $response['message']='Berhasil memproses servis.';
             echo json_encode($response);
         }
+        
+    }
+    
+    function daftar_notifikasi_admin(){
+        
+        $lists = array();
+        
+        $data = mysqli_query(db(),"SELECT * FROM tb_notification");
+        $unread = mysqli_query(db(), "SELECT COUNT(*) as unread FROM tb_notification WHERE notification_unread = '1'");
+        
+        while($row = mysqli_fetch_assoc($data)){
+            $lists[] = $row;
+        }
+        
+        $response['error']=false;
+        $response['message']='berhasil.';
+        $response['unread']=mysqli_fetch_assoc($unread)['unread'];
+        $response['notifikasi']=$lists;
+        echo json_encode($response);
+        
+    }
+    
+    function baca_notifikasi_admin(){
+        
+        mysqli_query(db(),"UPDATE tb_notification SET notification_unread = '0'");
+        
+        $response['error']=false;
+        $response['message']='berhasil';
+        echo json_encode($response);
         
     }
 ?>

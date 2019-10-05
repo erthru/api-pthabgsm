@@ -55,3 +55,4 @@
 [03-Oct-2019 05:00:09 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 1167
 [03-Oct-2019 05:00:36 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, boolean given in /home/erthrupr/public_html/pthabgsm/App.php on line 1167
 [03-Oct-2019 05:38:17 UTC] PHP Notice:  Undefined index: page in /home/erthrupr/public_html/pthabgsm/App.php on line 157
+[05-Oct-2019 06:14:37 UTC] PHP Notice:  Undefined variable: book_id in /home/erthrupr/public_html/pthabgsm/App.php on line 735
